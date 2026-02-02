@@ -1,0 +1,8 @@
+# IDEs (créés au niveau racine du projet)
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
