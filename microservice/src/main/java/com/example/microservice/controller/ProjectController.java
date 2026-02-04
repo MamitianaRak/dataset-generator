@@ -5,6 +5,7 @@ import com.example.microservice.dto.project.ProjectResponseDTO;
 import com.example.microservice.dto.project.ProjectUpdateDTO;
 import com.example.microservice.service.ProjectService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -39,12 +40,12 @@ public class ProjectController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectResponseDTO create(@RequestBody ProjectCreateDTO project) {
+    public ProjectResponseDTO create(@Valid @RequestBody ProjectCreateDTO project) {
         return projectService.save(project);
     }
 
     @PutMapping("/{id}")
-    public ProjectResponseDTO update(@PathVariable("id") Long id, @RequestBody ProjectUpdateDTO project) {
+    public ProjectResponseDTO update(@PathVariable("id") Long id, @Valid @RequestBody ProjectUpdateDTO project) {
         return projectService.update(id, project);
     }
 

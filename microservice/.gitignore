@@ -92,6 +92,3 @@ application-dev.properties
 
 ### Tests ###
 src/test/
-
-### Bruno collection ###
-bruno-collection

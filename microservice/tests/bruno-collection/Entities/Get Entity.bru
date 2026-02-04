@@ -1,0 +1,15 @@
+meta {
+  name: Get Entity
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/entities/{{entityId}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  entityId: 1
+}

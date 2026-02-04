@@ -4,6 +4,7 @@ import com.example.microservice.dto.entity.DataEntityCreateDTO;
 import com.example.microservice.dto.entity.DataEntityResponseDTO;
 import com.example.microservice.dto.entity.DataEntityUpdateDTO;
 import com.example.microservice.service.DataEntityService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class DataEntityController {
     @ResponseStatus(HttpStatus.CREATED)
     public DataEntityResponseDTO createEntity(
             @PathVariable("projectId") Long projectId,
-            @RequestBody DataEntityCreateDTO dto) {
+            @Valid @RequestBody DataEntityCreateDTO dto) {
         return dataEntityService.createEntity(projectId, dto);
     }
 
@@ -54,7 +55,7 @@ public class DataEntityController {
     @PutMapping("/entities/{id}")
     public DataEntityResponseDTO updateEntity(
             @PathVariable("id") Long id,
-            @RequestBody DataEntityUpdateDTO dto) {
+            @Valid @RequestBody DataEntityUpdateDTO dto) {
         return dataEntityService.updateEntity(id, dto);
     }
 

@@ -1,0 +1,15 @@
+meta {
+  name: Export XML
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/projects/{{projectId}}/export?format=xml
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  projectId: 1
+}
