@@ -1,16 +1,11 @@
 package com.example.microservice.dto.entity;
 
-import com.example.microservice.dto.entity.AttributeDTO;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import com.example.microservice.dto.entity.AttributeDTO;
-
 import lombok.Builder;
-import com.example.microservice.dto.entity.AttributeDTO;
-
 import lombok.Data;
-import com.example.microservice.dto.entity.AttributeDTO;
-
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -23,8 +18,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataEntityCreateDTO {
+    @NotBlank(message = "Entity name is required")
     private String name;
+
+    @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity;
+
+    @Valid
     private List<AttributeDTO> attributes;
+
+    @Valid
     private List<DataEntityCreateDTO> subEntities;
 }

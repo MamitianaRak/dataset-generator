@@ -1,0 +1,107 @@
+meta {
+  name: Create Entity - Product
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/projects/{{projectId}}/entities
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Product",
+    "quantity": 50,
+    "attributes": [
+      {
+        "name": "productId",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "SequentialGenerator",
+          "start": 1000,
+          "step": 1
+        }
+      },
+      {
+        "name": "name",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 50
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "price",
+        "type": {
+          "typeClass": "FloatType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 9.99,
+            "max": 999.99
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "category",
+        "type": {
+          "typeClass": "EnumType",
+          "values": ["Electronics", "Clothing", "Books", "Food", "Toys"]
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "inStock",
+        "type": {
+          "typeClass": "BooleanType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "createdAt",
+        "type": {
+          "typeClass": "DateType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 1577836800000,
+            "max": 1735689600000
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      }
+    ],
+    "subEntities": []
+  }
+}
+
+vars:pre-request {
+  projectId: 1
+}

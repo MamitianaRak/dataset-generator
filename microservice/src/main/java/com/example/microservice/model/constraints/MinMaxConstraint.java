@@ -14,6 +14,9 @@ public class MinMaxConstraint extends BaseConstraint implements IConstraint {
     private double max;
 
     public MinMaxConstraint(double min, double max) {
+        if (min > max) {
+            throw new IllegalArgumentException("min must be less than or equal to max");
+        }
         this.min = min;
         this.max = max;
     }
