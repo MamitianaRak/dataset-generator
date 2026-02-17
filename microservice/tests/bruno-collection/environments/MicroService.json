@@ -7,6 +7,20 @@
       "type": "text",
       "enabled": true,
       "secret": false
+    },
+    {
+      "name": "projectId",
+      "value": "1",
+      "type": "text",
+      "enabled": true,
+      "secret": false
+    },
+    {
+      "name": "entityId",
+      "value": "1",
+      "type": "text",
+      "enabled": true,
+      "secret": false
     }
   ],
   "info": {
