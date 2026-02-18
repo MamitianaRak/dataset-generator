@@ -1,0 +1,124 @@
+meta {
+  name: 04 - Add Product Entity
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/projects/{{current_project_id}}/entities
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Product",
+    "quantity": 50,
+    "attributes": [
+      {
+        "name": "productId",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "SequentialGenerator",
+          "start": 1000,
+          "step": 1
+        }
+      },
+      {
+        "name": "name",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 200
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "price",
+        "type": {
+          "typeClass": "FloatType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 0.01,
+            "max": 9999.99
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "category",
+        "type": {
+          "typeClass": "EnumType",
+          "values": ["Electronics", "Clothing", "Food", "Books"]
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "inStock",
+        "type": {
+          "typeClass": "BooleanType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "createdAt",
+        "type": {
+          "typeClass": "DateType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 1577836800000,
+            "max": 1735689600000
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      }
+    ],
+    "subEntities": []
+  }
+}
+
+tests {
+  test("Status code should be 201", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("Response should contain entity ID", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.id).to.be.a('number');
+  });
+
+  test("Response should contain entity name", function() {
+    expect(res.body).to.have.property('name');
+    expect(res.body.name).to.equal('Product');
+  });
+
+  test("Response should contain 6 attributes", function() {
+    expect(res.body.attributes).to.be.an('array');
+    expect(res.body.attributes.length).to.equal(6);
+  });
+}

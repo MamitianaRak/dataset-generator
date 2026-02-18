@@ -1,0 +1,2057 @@
+[
+  {
+    "iterationIndex": 0,
+    "results": [
+      {
+        "test": {
+          "filename": "IntegrationScenario\\01 - Create Project.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Integration Test Project - {{Math.floor(Date.now() / 1000)}}\"\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:39 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 12,
+            "name": "Integration Test Project - {{Math.floor(Date.now() / 1000)}}",
+            "dateCreated": "2026-02-18T09:09:39.422Z",
+            "lastUpdated": "2026-02-18T09:09:39.422Z"
+          },
+          "url": "http://localhost/api/projects",
+          "responseTime": 41
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201",
+            "status": "pass",
+            "uid": "9VoKHT1jFjHifGow5ytHJ"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "ZLBQjRFVPg1gjWiH-dKs0"
+          },
+          {
+            "description": "Response should contain project name",
+            "status": "pass",
+            "uid": "5oiDkFhXN-TT7Jlo3ReId"
+          },
+          {
+            "description": "Response should have dateCreated",
+            "status": "pass",
+            "uid": "vYqdNnVBtWpP6VEIz8LBH"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.3671295,
+        "name": "01 - Create Project",
+        "path": "IntegrationScenario\\01 - Create Project",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\02 - Add User Entity.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/12/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"User\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 1,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"name\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 100\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"age\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 18,\n          \"max\": 65\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 255\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"EmailGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:39 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 15,
+            "name": "User",
+            "quantity": 10,
+            "projectId": 12,
+            "attributes": [
+              {
+                "id": 106,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 107,
+                "name": "name",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 108,
+                "name": "age",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 65,
+                    "min": 18
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 109,
+                "name": "email",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "EmailGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/projects/12/entities",
+          "responseTime": 21
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201",
+            "status": "pass",
+            "uid": "kMW5GVV_KPmu7lfnTzZTl"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "kh1F_-LIbjDDiz-HFmtMo"
+          },
+          {
+            "description": "Response should contain entity name",
+            "status": "pass",
+            "uid": "KSgFRt-Xsh6Rmj8LEro2_"
+          },
+          {
+            "description": "Response should contain 4 attributes",
+            "status": "pass",
+            "uid": "1Pg2sqyAKnb-Wxtm2y8uw"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1236641,
+        "name": "02 - Add User Entity",
+        "path": "IntegrationScenario\\02 - Add User Entity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\03 - Update Entity.bru"
+        },
+        "request": {
+          "method": "PUT",
+          "url": "http://localhost:8081/api/entities/15",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"User\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 1,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"name\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 100\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"age\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 18,\n          \"max\": 65\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 255\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"EmailGenerator\"\n      }\n    },\n    {\n      \"name\": \"isActive\",\n      \"type\": {\n        \"typeClass\": \"BooleanType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:39 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 15,
+            "name": "User",
+            "quantity": 10,
+            "projectId": 12,
+            "attributes": [
+              {
+                "id": 110,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 111,
+                "name": "name",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 112,
+                "name": "age",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 65,
+                    "min": 18
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 113,
+                "name": "email",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "EmailGenerator"
+                }
+              },
+              {
+                "id": 114,
+                "name": "isActive",
+                "type": {
+                  "typeClass": "BooleanType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/entities/15",
+          "responseTime": 77
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200",
+            "status": "pass",
+            "uid": "Mq2RATCpWjVv0Tz5oMONi"
+          },
+          {
+            "description": "Response should contain updated entity",
+            "status": "pass",
+            "uid": "qZH_QkLZ7EU4gKg5_PisV"
+          },
+          {
+            "description": "Entity should have 5 attributes now",
+            "status": "pass",
+            "uid": "MUhZhHYah4l7jrvW3xhdG"
+          },
+          {
+            "description": "New attribute isActive should exist",
+            "status": "pass",
+            "uid": "ePbCC2UH9JSJSA4iF8d1F"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.3125038,
+        "name": "03 - Update Entity",
+        "path": "IntegrationScenario\\03 - Update Entity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\04 - Add Product Entity.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/12/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Product\",\n  \"quantity\": 50,\n  \"attributes\": [\n    {\n      \"name\": \"productId\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 1000,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"name\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 200\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"price\",\n      \"type\": {\n        \"typeClass\": \"FloatType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 0.01,\n          \"max\": 9999.99\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"category\",\n      \"type\": {\n        \"typeClass\": \"EnumType\",\n        \"values\": [\"Electronics\", \"Clothing\", \"Food\", \"Books\"]\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"inStock\",\n      \"type\": {\n        \"typeClass\": \"BooleanType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"createdAt\",\n      \"type\": {\n        \"typeClass\": \"DateType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 1577836800000,\n          \"max\": 1735689600000\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 16,
+            "name": "Product",
+            "quantity": 50,
+            "projectId": 12,
+            "attributes": [
+              {
+                "id": 115,
+                "name": "productId",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 116,
+                "name": "name",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 117,
+                "name": "price",
+                "type": {
+                  "typeClass": "FloatType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 9999.99,
+                    "min": 0.01
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 118,
+                "name": "category",
+                "type": {
+                  "typeClass": "EnumType",
+                  "values": [
+                    "Electronics",
+                    "Clothing",
+                    "Food",
+                    "Books"
+                  ]
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 119,
+                "name": "inStock",
+                "type": {
+                  "typeClass": "BooleanType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 120,
+                "name": "createdAt",
+                "type": {
+                  "typeClass": "DateType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 1735689600000,
+                    "min": 1577836800000
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/projects/12/entities",
+          "responseTime": 27
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201",
+            "status": "pass",
+            "uid": "FaDQKS0CmD_f3DZBJAKWJ"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "qQ7A796AOdoom1l7kzEre"
+          },
+          {
+            "description": "Response should contain entity name",
+            "status": "pass",
+            "uid": "slkPbnUh6VTT5tB3FGbcV"
+          },
+          {
+            "description": "Response should contain 6 attributes",
+            "status": "pass",
+            "uid": "JtfFbx69SLodor8PySy-S"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1224474,
+        "name": "04 - Add Product Entity",
+        "path": "IntegrationScenario\\04 - Add Product Entity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\05 - Preview Data.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/12/preview?count=5",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "projectId": 12,
+            "projectName": "Integration Test Project - {{Math.floor(Date.now() / 1000)}}",
+            "data": [
+              {
+                "entityName": "Product",
+                "records": [
+                  {
+                    "fields": {
+                      "createdAt": "2018-12-29T05:17:33.231Z",
+                      "productId": 1,
+                      "price": 6946.272103267125,
+                      "name": "134daa4b",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2020-04-05T12:45:46.630Z",
+                      "productId": 2,
+                      "price": 123.8725197901994,
+                      "name": "0d1160d9",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2003-05-13T13:23:41.516Z",
+                      "productId": 3,
+                      "price": 2747.2424263003995,
+                      "name": "6d5ddc51",
+                      "inStock": false,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2006-09-04T09:38:44.972Z",
+                      "productId": 4,
+                      "price": 1438.4406944324817,
+                      "name": "42e5c910",
+                      "inStock": true,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1999-03-25T02:42:44.937Z",
+                      "productId": 5,
+                      "price": 8790.404903543274,
+                      "name": "9f3a4316",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2002-08-24T06:00:48.714Z",
+                      "productId": 6,
+                      "price": 4299.407347857916,
+                      "name": "cab6a158",
+                      "inStock": false,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2006-01-20T00:03:31.050Z",
+                      "productId": 7,
+                      "price": 8151.163440977259,
+                      "name": "b424c513",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1997-03-28T21:43:20.790Z",
+                      "productId": 8,
+                      "price": 8643.097682547776,
+                      "name": "cb464490",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2005-09-15T07:10:41.555Z",
+                      "productId": 9,
+                      "price": 840.8065311918906,
+                      "name": "27905567",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1970-01-11T12:00:49.945Z",
+                      "productId": 10,
+                      "price": 6268.166851938888,
+                      "name": "8bc05c3a",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1972-01-22T00:59:19.727Z",
+                      "productId": 11,
+                      "price": 1549.6738760743795,
+                      "name": "b166532a",
+                      "inStock": false,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2008-08-03T10:26:56.434Z",
+                      "productId": 12,
+                      "price": 2673.064161672529,
+                      "name": "af7894f0",
+                      "inStock": true,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1972-05-14T23:11:01.983Z",
+                      "productId": 13,
+                      "price": 9012.002276051115,
+                      "name": "e080b1da",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2024-08-11T16:23:30.540Z",
+                      "productId": 14,
+                      "price": 6450.50795578073,
+                      "name": "b22a8642",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2017-03-14T19:23:11.189Z",
+                      "productId": 15,
+                      "price": 8060.90002357522,
+                      "name": "8606bf7c",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2014-05-23T15:13:20.620Z",
+                      "productId": 16,
+                      "price": 8992.313546652484,
+                      "name": "96f92bc8",
+                      "inStock": true,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1975-10-31T18:09:43.648Z",
+                      "productId": 17,
+                      "price": 7167.526477395166,
+                      "name": "b1ee2265",
+                      "inStock": false,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1977-08-16T02:37:09.593Z",
+                      "productId": 18,
+                      "price": 5720.738923544724,
+                      "name": "02736e61",
+                      "inStock": false,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2014-12-18T01:38:18.877Z",
+                      "productId": 19,
+                      "price": 7801.275631608037,
+                      "name": "fe2f7757",
+                      "inStock": true,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2002-05-12T23:40:53.887Z",
+                      "productId": 20,
+                      "price": 874.8299667154184,
+                      "name": "f8582488",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2004-06-28T18:30:51.366Z",
+                      "productId": 21,
+                      "price": 6222.912391244654,
+                      "name": "af881917",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2007-12-12T15:17:18.499Z",
+                      "productId": 22,
+                      "price": 2223.127187108056,
+                      "name": "8571d147",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2020-11-24T10:05:51.512Z",
+                      "productId": 23,
+                      "price": 2403.7053621070013,
+                      "name": "41cc5309",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1975-09-19T15:47:44.040Z",
+                      "productId": 24,
+                      "price": 7535.857864778274,
+                      "name": "cf1a2110",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2017-12-14T08:02:25.847Z",
+                      "productId": 25,
+                      "price": 6378.236466357396,
+                      "name": "7bea6ae8",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2004-03-04T07:42:39.051Z",
+                      "productId": 26,
+                      "price": 7724.39218011095,
+                      "name": "df5c12f4",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1977-06-25T17:41:41.410Z",
+                      "productId": 27,
+                      "price": 6371.853701656347,
+                      "name": "ee64b9a2",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1994-11-05T20:25:13.045Z",
+                      "productId": 28,
+                      "price": 143.77872209051563,
+                      "name": "e2c7f62b",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2014-07-01T17:06:54.388Z",
+                      "productId": 29,
+                      "price": 36.3020860192142,
+                      "name": "890a05c1",
+                      "inStock": true,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2001-03-31T06:38:58.736Z",
+                      "productId": 30,
+                      "price": 1462.134732709586,
+                      "name": "1aa8c1de",
+                      "inStock": false,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2023-07-23T06:49:22.700Z",
+                      "productId": 31,
+                      "price": 4777.132660074309,
+                      "name": "adbd7a39",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1972-04-28T10:40:49.350Z",
+                      "productId": 32,
+                      "price": 941.5203294859552,
+                      "name": "5fb28c92",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1984-09-20T21:22:31.645Z",
+                      "productId": 33,
+                      "price": 2816.4783719092748,
+                      "name": "f8afc5b2",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1970-03-11T18:50:48.991Z",
+                      "productId": 34,
+                      "price": 9067.263023196421,
+                      "name": "3d93e8cb",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1973-05-08T03:48:52.201Z",
+                      "productId": 35,
+                      "price": 3814.5534873410825,
+                      "name": "94e0239a",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2017-12-09T23:31:04.297Z",
+                      "productId": 36,
+                      "price": 1733.5165758727749,
+                      "name": "133ca7d1",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2023-03-23T07:52:07.945Z",
+                      "productId": 37,
+                      "price": 2740.405536084232,
+                      "name": "ad8d5efb",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1991-09-22T10:02:26.664Z",
+                      "productId": 38,
+                      "price": 9071.074110454929,
+                      "name": "322f0af9",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2025-06-03T08:54:01.287Z",
+                      "productId": 39,
+                      "price": 3556.464976884712,
+                      "name": "7563876f",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2003-05-10T00:54:12.827Z",
+                      "productId": 40,
+                      "price": 9330.656980670192,
+                      "name": "2b1bec2d",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1994-11-26T14:07:42.029Z",
+                      "productId": 41,
+                      "price": 3143.716857789948,
+                      "name": "13841e62",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1970-07-25T11:57:37.617Z",
+                      "productId": 42,
+                      "price": 9750.523791974674,
+                      "name": "2653ea7f",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2020-02-24T05:54:35.097Z",
+                      "productId": 43,
+                      "price": 2877.4115996103255,
+                      "name": "6a335807",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2004-02-16T22:24:21.313Z",
+                      "productId": 44,
+                      "price": 7197.1230248158845,
+                      "name": "927305a4",
+                      "inStock": false,
+                      "category": "Clothing"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1977-11-20T08:55:16.880Z",
+                      "productId": 45,
+                      "price": 3159.6132402357935,
+                      "name": "8484311b",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1988-01-10T10:26:42.947Z",
+                      "productId": 46,
+                      "price": 4623.114387950525,
+                      "name": "4548a945",
+                      "inStock": true,
+                      "category": "Books"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1981-05-29T17:52:32.810Z",
+                      "productId": 47,
+                      "price": 4970.887121751012,
+                      "name": "42432ae3",
+                      "inStock": false,
+                      "category": "Electronics"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1987-11-24T09:55:41.136Z",
+                      "productId": 48,
+                      "price": 4505.120564519107,
+                      "name": "20e90a67",
+                      "inStock": false,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "2009-05-08T11:59:16.572Z",
+                      "productId": 49,
+                      "price": 723.1529446405737,
+                      "name": "38fea79c",
+                      "inStock": true,
+                      "category": "Food"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "createdAt": "1976-10-04T22:18:27.636Z",
+                      "productId": 50,
+                      "price": 5770.99936557151,
+                      "name": "d3472be1",
+                      "inStock": true,
+                      "category": "Electronics"
+                    }
+                  }
+                ]
+              },
+              {
+                "entityName": "User",
+                "records": [
+                  {
+                    "fields": {
+                      "name": "ac24f636",
+                      "id": 1,
+                      "isActive": true,
+                      "age": 51,
+                      "email": "olivia.jackson@mail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "81dc904d",
+                      "id": 2,
+                      "isActive": false,
+                      "age": 33,
+                      "email": "isabelle.johnson@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "6a3f04a0",
+                      "id": 3,
+                      "isActive": false,
+                      "age": 52,
+                      "email": "alice.davis@demo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "e6a6a286",
+                      "id": 4,
+                      "isActive": false,
+                      "age": 64,
+                      "email": "emma.thomas@hotmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "e609312c",
+                      "id": 5,
+                      "isActive": true,
+                      "age": 64,
+                      "email": "john.davis@gmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "8b8ef191",
+                      "id": 6,
+                      "isActive": true,
+                      "age": 51,
+                      "email": "frank.gonzalez@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "9b6f3f7a",
+                      "id": 7,
+                      "isActive": false,
+                      "age": 18,
+                      "email": "henry.rodriguez@yahoo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "df7ee87f",
+                      "id": 8,
+                      "isActive": true,
+                      "age": 33,
+                      "email": "frank.taylor@yahoo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "8dd3df34",
+                      "id": 9,
+                      "isActive": false,
+                      "age": 58,
+                      "email": "henry.johnson@email.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "name": "2105364c",
+                      "id": 10,
+                      "isActive": true,
+                      "age": 65,
+                      "email": "grace.hernandez@hotmail.com"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "url": "http://localhost/api/projects/12/preview?count=5",
+          "responseTime": 17
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200",
+            "status": "pass",
+            "uid": "Z1EJLmWinWb1obTMwU-58"
+          },
+          {
+            "description": "Response should be an object",
+            "status": "pass",
+            "uid": "0619ZX4C6mrkwSRBQerYf"
+          },
+          {
+            "description": "Response should contain project information",
+            "status": "pass",
+            "uid": "MG7DklYRLXpiid26nRXmR"
+          },
+          {
+            "description": "Response should contain generated data",
+            "status": "pass",
+            "uid": "LhJRIadFa8LNsQo83c7wH"
+          },
+          {
+            "description": "Should have data for 2 entities",
+            "status": "pass",
+            "uid": "MS5bZDY4h1U3KUA5IMyMM"
+          },
+          {
+            "description": "Each entity should have entityName and records",
+            "status": "pass",
+            "uid": "GbrpHcaEaV8QLNYhXbffW"
+          },
+          {
+            "description": "Records should contain at least 5 items each",
+            "status": "pass",
+            "uid": "f-qLac5T17t0ex8m9lsKc"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1163383,
+        "name": "05 - Preview Data",
+        "path": "IntegrationScenario\\05 - Preview Data",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\06 - Export JSON.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/12/export?format=json&count=10",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-disposition": "attachment; filename=dataset_12.json",
+            "accept-ranges": "bytes",
+            "content-type": "application/json",
+            "content-length": "7922",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "Product": [
+              {
+                "createdAt": "Sun Nov 08 10:06:40 CET 2015",
+                "productId": 1,
+                "price": 4238.726548012791,
+                "name": "45938c4a",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Sun Oct 14 18:08:03 CET 1990",
+                "productId": 2,
+                "price": 303.71875913782173,
+                "name": "f7192667",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Thu Jun 18 01:57:28 CEST 2020",
+                "productId": 3,
+                "price": 9032.57497840847,
+                "name": "77e307a1",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Wed Jan 28 09:36:02 CET 1987",
+                "productId": 4,
+                "price": 7735.857003937925,
+                "name": "32ec8d15",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Tue Jul 08 10:08:12 CEST 2014",
+                "productId": 5,
+                "price": 605.3518309716144,
+                "name": "3ad6104e",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Fri Feb 14 12:28:25 CET 1975",
+                "productId": 6,
+                "price": 7706.056263708726,
+                "name": "1a51be23",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Wed Oct 19 13:38:38 CET 1994",
+                "productId": 7,
+                "price": 1538.813966895721,
+                "name": "70fb5ea2",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Thu Aug 06 06:20:15 CET 1970",
+                "productId": 8,
+                "price": 5260.819080024274,
+                "name": "36db0f53",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Wed Nov 21 15:26:11 CET 1973",
+                "productId": 9,
+                "price": 2964.773327384926,
+                "name": "8ed0c44f",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Sat Jun 14 18:56:44 CEST 2025",
+                "productId": 10,
+                "price": 6024.166557837033,
+                "name": "6a74d9eb",
+                "inStock": true,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Fri Dec 22 13:19:43 CET 1978",
+                "productId": 11,
+                "price": 3459.464146570585,
+                "name": "a8d6a510",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Sun Feb 05 03:17:59 CET 1978",
+                "productId": 12,
+                "price": 6514.310581134062,
+                "name": "9dbfe562",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Thu Jan 11 09:31:26 CET 2001",
+                "productId": 13,
+                "price": 8135.954377093972,
+                "name": "49fb2820",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Mon Apr 08 06:42:58 CEST 1996",
+                "productId": 14,
+                "price": 2971.484024553277,
+                "name": "fce9a32a",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Sun Apr 14 20:31:39 CEST 2019",
+                "productId": 15,
+                "price": 8512.829662150845,
+                "name": "337e0720",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Tue Jul 16 13:46:17 CEST 1985",
+                "productId": 16,
+                "price": 4792.75220144271,
+                "name": "a5626f99",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Tue Feb 28 15:58:42 CET 2006",
+                "productId": 17,
+                "price": 3448.0370726729216,
+                "name": "d4c104b9",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Fri Jul 24 17:55:06 CEST 1981",
+                "productId": 18,
+                "price": 7769.152597004162,
+                "name": "1931b75b",
+                "inStock": false,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Tue Mar 03 22:32:53 CET 1981",
+                "productId": 19,
+                "price": 1499.6795076952476,
+                "name": "9515ce33",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Sun Mar 14 17:31:45 CET 2021",
+                "productId": 20,
+                "price": 5985.765933825332,
+                "name": "c3326f30",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Tue Jul 07 18:35:38 CEST 1987",
+                "productId": 21,
+                "price": 3644.8100740320233,
+                "name": "20af4914",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Sat Feb 16 22:56:58 CET 1991",
+                "productId": 22,
+                "price": 8627.484848346012,
+                "name": "22d4e8ce",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Wed Jul 14 21:03:15 CEST 2004",
+                "productId": 23,
+                "price": 8144.287987436056,
+                "name": "347a036a",
+                "inStock": false,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Fri Nov 09 17:58:12 CET 1984",
+                "productId": 24,
+                "price": 2088.3018684068497,
+                "name": "3b8205f9",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Sun Jul 05 18:49:27 CEST 2020",
+                "productId": 25,
+                "price": 2433.9815551760958,
+                "name": "8a762d29",
+                "inStock": true,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Mon Nov 21 03:55:58 CET 1988",
+                "productId": 26,
+                "price": 8172.488349203462,
+                "name": "d5187de2",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Tue Dec 31 15:48:23 CET 2024",
+                "productId": 27,
+                "price": 8852.992490486835,
+                "name": "d74af900",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Thu Sep 06 00:00:57 CET 1973",
+                "productId": 28,
+                "price": 4172.874260481997,
+                "name": "95e768d8",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Fri Dec 29 10:18:34 CET 2023",
+                "productId": 29,
+                "price": 5548.900411274164,
+                "name": "4af18aec",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Tue Oct 16 09:08:06 CEST 2018",
+                "productId": 30,
+                "price": 9986.926138342451,
+                "name": "3f897992",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Fri Jan 04 09:37:41 CET 2008",
+                "productId": 31,
+                "price": 2442.2483987118026,
+                "name": "86979974",
+                "inStock": false,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Mon Feb 09 02:22:15 CET 1981",
+                "productId": 32,
+                "price": 4871.302876564687,
+                "name": "29ea8048",
+                "inStock": true,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Mon Sep 15 05:17:55 CEST 2008",
+                "productId": 33,
+                "price": 6263.254364541109,
+                "name": "0b19dbbc",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Wed Aug 02 12:27:02 CEST 1978",
+                "productId": 34,
+                "price": 2022.9589385644229,
+                "name": "698e9033",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Mon Apr 02 09:00:07 CEST 2012",
+                "productId": 35,
+                "price": 2617.6836873375005,
+                "name": "28d3d3a8",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Fri Jul 09 04:46:33 CEST 1976",
+                "productId": 36,
+                "price": 1908.9684638143283,
+                "name": "57ed2ecb",
+                "inStock": true,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Wed Dec 24 17:48:01 CET 2014",
+                "productId": 37,
+                "price": 6183.548465917518,
+                "name": "550ffc19",
+                "inStock": false,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Mon Dec 31 00:45:30 CET 1979",
+                "productId": 38,
+                "price": 5543.764571299431,
+                "name": "3fe8d732",
+                "inStock": false,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Wed Mar 03 19:58:19 CET 2004",
+                "productId": 39,
+                "price": 9526.14717952941,
+                "name": "1c80a255",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Fri Jul 26 00:14:16 CEST 2002",
+                "productId": 40,
+                "price": 1041.6623262837225,
+                "name": "72a6809d",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Thu Oct 27 16:35:13 CEST 2005",
+                "productId": 41,
+                "price": 3841.7983691847903,
+                "name": "ff0488e7",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Sat Aug 25 12:28:01 CEST 2001",
+                "productId": 42,
+                "price": 1464.9338531221647,
+                "name": "f5d3f14c",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Sun Nov 22 11:04:28 CET 2009",
+                "productId": 43,
+                "price": 1056.2659367746116,
+                "name": "d9911d14",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Thu Oct 26 13:36:09 CEST 2023",
+                "productId": 44,
+                "price": 8864.061251959034,
+                "name": "d0e7f33a",
+                "inStock": false,
+                "category": "Clothing"
+              },
+              {
+                "createdAt": "Mon Mar 21 00:15:59 CET 1983",
+                "productId": 45,
+                "price": 1120.3801344867704,
+                "name": "cb7275ca",
+                "inStock": true,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Thu May 11 11:57:59 CEST 1995",
+                "productId": 46,
+                "price": 9490.902989504799,
+                "name": "09515804",
+                "inStock": false,
+                "category": "Books"
+              },
+              {
+                "createdAt": "Thu Oct 14 07:57:43 CEST 2010",
+                "productId": 47,
+                "price": 3728.9983754293894,
+                "name": "0edff55f",
+                "inStock": true,
+                "category": "Food"
+              },
+              {
+                "createdAt": "Fri May 11 14:12:45 CEST 1990",
+                "productId": 48,
+                "price": 3390.551129989512,
+                "name": "1884c24f",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Sun Nov 29 09:14:27 CET 2020",
+                "productId": 49,
+                "price": 2863.39859049133,
+                "name": "eb5fd7bb",
+                "inStock": true,
+                "category": "Electronics"
+              },
+              {
+                "createdAt": "Thu Mar 17 00:25:25 CET 2005",
+                "productId": 50,
+                "price": 9280.749503266725,
+                "name": "7313e258",
+                "inStock": true,
+                "category": "Books"
+              }
+            ],
+            "User": [
+              {
+                "name": "a7d564a8",
+                "id": 1,
+                "isActive": true,
+                "age": 61,
+                "email": "leo.johnson@hotmail.com"
+              },
+              {
+                "name": "b5c940c3",
+                "id": 2,
+                "isActive": true,
+                "age": 50,
+                "email": "victor.smith@icloud.com"
+              },
+              {
+                "name": "1a7e2023",
+                "id": 3,
+                "isActive": true,
+                "age": 18,
+                "email": "nathan.jackson@yahoo.com"
+              },
+              {
+                "name": "7381cddc",
+                "id": 4,
+                "isActive": false,
+                "age": 57,
+                "email": "henry.gonzalez@mail.com"
+              },
+              {
+                "name": "6cab72c1",
+                "id": 5,
+                "isActive": true,
+                "age": 49,
+                "email": "maria.miller@mail.com"
+              },
+              {
+                "name": "daef0174",
+                "id": 6,
+                "isActive": true,
+                "age": 41,
+                "email": "olivia.thomas@test.com"
+              },
+              {
+                "name": "5dae150f",
+                "id": 7,
+                "isActive": false,
+                "age": 58,
+                "email": "emma.moore@demo.com"
+              },
+              {
+                "name": "3b7a76de",
+                "id": 8,
+                "isActive": true,
+                "age": 57,
+                "email": "henry.anderson@email.com"
+              },
+              {
+                "name": "867cddf8",
+                "id": 9,
+                "isActive": true,
+                "age": 62,
+                "email": "emma.taylor@gmail.com"
+              },
+              {
+                "name": "6ad0888e",
+                "id": 10,
+                "isActive": false,
+                "age": 31,
+                "email": "bob.anderson@test.com"
+              }
+            ]
+          },
+          "url": "http://localhost/api/projects/12/export?format=json&count=10",
+          "responseTime": 41
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200",
+            "status": "pass",
+            "uid": "S48ysB4yTcKZ2P29xA1tA"
+          },
+          {
+            "description": "Content-Type should be application/json",
+            "status": "pass",
+            "uid": "UO5ejy5pfUXvdLfJYtiNF"
+          },
+          {
+            "description": "Response should be valid JSON",
+            "status": "pass",
+            "uid": "f90-DHX-K9Ngq_NL1q1eD"
+          },
+          {
+            "description": "Response should contain User and Product",
+            "status": "pass",
+            "uid": "thVpfe34FEo3b-8bxz98M"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1506114,
+        "name": "06 - Export JSON",
+        "path": "IntegrationScenario\\06 - Export JSON",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\07 - Export XML.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/12/export?format=xml&count=10",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-disposition": "attachment; filename=dataset_12.xml",
+            "accept-ranges": "bytes",
+            "content-type": "application/xml",
+            "content-length": "14349",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<dataset>\n  <entity name=\"Product\">\n    <record>\n      <createdAt>Thu Mar 01 23:32:15 CET 1979</createdAt>\n      <productId>1</productId>\n      <price>6766.640348332477</price>\n      <name>bd80ded9</name>\n      <inStock>false</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Sat Dec 05 05:07:47 CET 1998</createdAt>\n      <productId>2</productId>\n      <price>5135.411822614006</price>\n      <name>8a7a4913</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Wed Dec 28 03:44:23 CET 1994</createdAt>\n      <productId>3</productId>\n      <price>3931.4617888367993</price>\n      <name>8df77004</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Sun Apr 21 13:48:04 CEST 2019</createdAt>\n      <productId>4</productId>\n      <price>8384.98287083068</price>\n      <name>9e9a7b28</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Wed Oct 11 00:03:02 CET 1995</createdAt>\n      <productId>5</productId>\n      <price>6214.036980162694</price>\n      <name>52a74b12</name>\n      <inStock>false</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Wed Jul 08 06:42:30 CEST 1992</createdAt>\n      <productId>6</productId>\n      <price>5077.3085960671915</price>\n      <name>69be2bcd</name>\n      <inStock>false</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Sat Jul 19 08:26:08 CEST 1997</createdAt>\n      <productId>7</productId>\n      <price>7500.380434398727</price>\n      <name>e117ffd1</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Wed Mar 22 15:28:22 CET 2017</createdAt>\n      <productId>8</productId>\n      <price>4801.681314632955</price>\n      <name>61775b37</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Thu Mar 08 02:46:27 CET 1984</createdAt>\n      <productId>9</productId>\n      <price>4484.307744081166</price>\n      <name>6af70120</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Tue Feb 01 16:28:07 CET 2000</createdAt>\n      <productId>10</productId>\n      <price>1360.5366322407478</price>\n      <name>0f019ff7</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Sun Jul 16 00:56:34 CEST 2000</createdAt>\n      <productId>11</productId>\n      <price>9220.050788112669</price>\n      <name>55235cd3</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Sun Jan 28 05:13:27 CET 2001</createdAt>\n      <productId>12</productId>\n      <price>7180.845299905708</price>\n      <name>544a8c4a</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Sun Jan 28 00:13:56 CET 1996</createdAt>\n      <productId>13</productId>\n      <price>5878.345717055244</price>\n      <name>e3d08b42</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Fri Jun 05 12:34:40 CEST 1998</createdAt>\n      <productId>14</productId>\n      <price>611.8383239804343</price>\n      <name>e5f0b776</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Thu Aug 03 20:15:56 CEST 2023</createdAt>\n      <productId>15</productId>\n      <price>7551.891839787095</price>\n      <name>8dc9200b</name>\n      <inStock>true</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Wed Jun 26 15:54:22 CEST 1985</createdAt>\n      <productId>16</productId>\n      <price>1276.079261753747</price>\n      <name>6e85a83a</name>\n      <inStock>true</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Tue Nov 03 00:45:48 CET 1998</createdAt>\n      <productId>17</productId>\n      <price>9360.902375711657</price>\n      <name>c6397f03</name>\n      <inStock>true</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Fri Jul 01 07:03:40 CEST 2022</createdAt>\n      <productId>18</productId>\n      <price>5544.074896766208</price>\n      <name>e99e4863</name>\n      <inStock>true</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Sun Jan 07 00:13:11 CET 2001</createdAt>\n      <productId>19</productId>\n      <price>8468.48942182173</price>\n      <name>130e0479</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Wed Apr 29 12:07:59 CEST 2015</createdAt>\n      <productId>20</productId>\n      <price>3013.6115015267633</price>\n      <name>fbc6ffb6</name>\n      <inStock>false</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Sat Jan 22 01:33:33 CET 1994</createdAt>\n      <productId>21</productId>\n      <price>5566.376561137254</price>\n      <name>e34142e0</name>\n      <inStock>true</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Sun Sep 27 07:23:18 CEST 1998</createdAt>\n      <productId>22</productId>\n      <price>2247.768732274676</price>\n      <name>02ce10ab</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Tue Sep 05 14:55:49 CEST 2000</createdAt>\n      <productId>23</productId>\n      <price>9222.916329783571</price>\n      <name>1eabbb9f</name>\n      <inStock>true</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Fri Aug 10 06:35:52 CEST 1984</createdAt>\n      <productId>24</productId>\n      <price>514.53950227903</price>\n      <name>ee2f36e8</name>\n      <inStock>true</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Sun Jan 17 12:15:55 CET 1971</createdAt>\n      <productId>25</productId>\n      <price>7645.949741809707</price>\n      <name>cd535a20</name>\n      <inStock>false</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Sat Jul 05 07:14:30 CEST 2014</createdAt>\n      <productId>26</productId>\n      <price>4839.336751668938</price>\n      <name>00e210fd</name>\n      <inStock>true</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Sun Jul 14 00:51:29 CEST 1985</createdAt>\n      <productId>27</productId>\n      <price>8005.457694904243</price>\n      <name>5efc05e4</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Thu Feb 22 16:51:04 CET 2001</createdAt>\n      <productId>28</productId>\n      <price>6199.641923458863</price>\n      <name>c68317c0</name>\n      <inStock>true</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Sat Jun 23 13:08:14 CEST 2018</createdAt>\n      <productId>29</productId>\n      <price>2746.1411128208283</price>\n      <name>6f101faf</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Sun Jul 04 01:45:36 CEST 1993</createdAt>\n      <productId>30</productId>\n      <price>2432.4523037583235</price>\n      <name>c2ef9499</name>\n      <inStock>true</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Thu Jul 07 06:26:18 CEST 1994</createdAt>\n      <productId>31</productId>\n      <price>4212.246016553573</price>\n      <name>5e70976f</name>\n      <inStock>true</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Thu Apr 29 13:28:44 CEST 1982</createdAt>\n      <productId>32</productId>\n      <price>9573.187035005265</price>\n      <name>69c1a28f</name>\n      <inStock>true</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Sat Feb 19 11:16:55 CET 2011</createdAt>\n      <productId>33</productId>\n      <price>2480.554738269598</price>\n      <name>e43ee126</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Mon Jun 12 21:24:51 CET 1972</createdAt>\n      <productId>34</productId>\n      <price>3486.1571131511014</price>\n      <name>e6207404</name>\n      <inStock>true</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Fri Feb 26 11:11:30 CET 1999</createdAt>\n      <productId>35</productId>\n      <price>8278.702468609206</price>\n      <name>d482c1d7</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Thu Oct 06 17:51:49 CEST 2022</createdAt>\n      <productId>36</productId>\n      <price>275.5458953209786</price>\n      <name>a75366f1</name>\n      <inStock>false</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Fri Apr 18 18:48:02 CEST 1986</createdAt>\n      <productId>37</productId>\n      <price>142.08793371958362</price>\n      <name>8c6e4245</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Tue May 03 10:19:32 CEST 2022</createdAt>\n      <productId>38</productId>\n      <price>2984.484929295537</price>\n      <name>d26c7b4d</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Tue Dec 31 17:35:28 CET 1991</createdAt>\n      <productId>39</productId>\n      <price>7071.856382467983</price>\n      <name>a7c05569</name>\n      <inStock>false</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Fri Jul 20 19:27:54 CEST 1984</createdAt>\n      <productId>40</productId>\n      <price>5301.511996331797</price>\n      <name>30f492b3</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Sun Feb 08 20:17:33 CET 2026</createdAt>\n      <productId>41</productId>\n      <price>9599.400563606121</price>\n      <name>e509e2bf</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Wed Nov 06 17:54:23 CET 1991</createdAt>\n      <productId>42</productId>\n      <price>8614.615090870466</price>\n      <name>30ac775d</name>\n      <inStock>true</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Sat May 02 16:54:14 CEST 1987</createdAt>\n      <productId>43</productId>\n      <price>688.7789411134165</price>\n      <name>ffcebf44</name>\n      <inStock>false</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Mon Jun 13 22:28:21 CEST 1977</createdAt>\n      <productId>44</productId>\n      <price>3900.5320276241223</price>\n      <name>034a4a35</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Wed Jan 06 05:26:46 CET 2016</createdAt>\n      <productId>45</productId>\n      <price>5831.930086533053</price>\n      <name>93a61d60</name>\n      <inStock>false</inStock>\n      <category>Food</category>\n    </record>\n    <record>\n      <createdAt>Tue Sep 28 03:19:41 CET 1976</createdAt>\n      <productId>46</productId>\n      <price>3136.495859034173</price>\n      <name>b6a045ee</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n    <record>\n      <createdAt>Sun Jan 25 13:20:39 CET 1998</createdAt>\n      <productId>47</productId>\n      <price>9174.82762777397</price>\n      <name>75e5185e</name>\n      <inStock>false</inStock>\n      <category>Clothing</category>\n    </record>\n    <record>\n      <createdAt>Wed Sep 01 20:39:19 CET 1971</createdAt>\n      <productId>48</productId>\n      <price>8605.84023112562</price>\n      <name>7c9386f3</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Fri Jun 04 20:51:50 CEST 2004</createdAt>\n      <productId>49</productId>\n      <price>9879.14632318619</price>\n      <name>95317333</name>\n      <inStock>false</inStock>\n      <category>Electronics</category>\n    </record>\n    <record>\n      <createdAt>Fri Jul 28 20:30:04 CEST 2017</createdAt>\n      <productId>50</productId>\n      <price>1474.1957979041479</price>\n      <name>d816d2d7</name>\n      <inStock>false</inStock>\n      <category>Books</category>\n    </record>\n  </entity>\n  <entity name=\"User\">\n    <record>\n      <name>4193752a</name>\n      <id>1</id>\n      <isActive>false</isActive>\n      <age>56</age>\n      <email>henry.jackson@outlook.com</email>\n    </record>\n    <record>\n      <name>0b38e936</name>\n      <id>2</id>\n      <isActive>false</isActive>\n      <age>30</age>\n      <email>isabelle.lopez@example.com</email>\n    </record>\n    <record>\n      <name>1a3cd3e6</name>\n      <id>3</id>\n      <isActive>true</isActive>\n      <age>46</age>\n      <email>frank.taylor@demo.com</email>\n    </record>\n    <record>\n      <name>6e5d3fd1</name>\n      <id>4</id>\n      <isActive>true</isActive>\n      <age>29</age>\n      <email>rachel.martin@icloud.com</email>\n    </record>\n    <record>\n      <name>dd14ee40</name>\n      <id>5</id>\n      <isActive>false</isActive>\n      <age>48</age>\n      <email>peter.brown@mail.com</email>\n    </record>\n    <record>\n      <name>9be329ee</name>\n      <id>6</id>\n      <isActive>true</isActive>\n      <age>56</age>\n      <email>tara.wilson@mail.com</email>\n    </record>\n    <record>\n      <name>d3a76287</name>\n      <id>7</id>\n      <isActive>false</isActive>\n      <age>42</age>\n      <email>peter.williams@hotmail.com</email>\n    </record>\n    <record>\n      <name>04b6e8b9</name>\n      <id>8</id>\n      <isActive>false</isActive>\n      <age>56</age>\n      <email>henry.thomas@hotmail.com</email>\n    </record>\n    <record>\n      <name>9c460d4b</name>\n      <id>9</id>\n      <isActive>true</isActive>\n      <age>19</age>\n      <email>kate.taylor@icloud.com</email>\n    </record>\n    <record>\n      <name>49dc8c74</name>\n      <id>10</id>\n      <isActive>false</isActive>\n      <age>33</age>\n      <email>emma.williams@email.com</email>\n    </record>\n  </entity>\n</dataset>\n",
+          "url": "http://localhost/api/projects/12/export?format=xml&count=10",
+          "responseTime": 18
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200",
+            "status": "pass",
+            "uid": "6HVUf2NSp9y8TlHJ14pXz"
+          },
+          {
+            "description": "Content-Type should be application/xml",
+            "status": "pass",
+            "uid": "O2QD8Dp_jFDYxAQYy9V_r"
+          },
+          {
+            "description": "Response should not be empty",
+            "status": "pass",
+            "uid": "ZXBf9h5A3luDUNcB13I0A"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.150821,
+        "name": "07 - Export XML",
+        "path": "IntegrationScenario\\07 - Export XML",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\08 - List Project Entities.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/12/entities",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": [
+            {
+              "id": 15,
+              "name": "User",
+              "quantity": 10,
+              "projectId": 12,
+              "attributes": [
+                {
+                  "id": 110,
+                  "name": "id",
+                  "type": {
+                    "typeClass": "IntegerType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "SequentialGenerator",
+                    "startValue": 1
+                  }
+                },
+                {
+                  "id": 111,
+                  "name": "name",
+                  "type": {
+                    "typeClass": "StringType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 112,
+                  "name": "age",
+                  "type": {
+                    "typeClass": "IntegerType"
+                  },
+                  "constraints": [
+                    {
+                      "constraintClass": "MinMaxConstraint",
+                      "max": 65,
+                      "min": 18
+                    }
+                  ],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 113,
+                  "name": "email",
+                  "type": {
+                    "typeClass": "StringType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "EmailGenerator"
+                  }
+                },
+                {
+                  "id": 114,
+                  "name": "isActive",
+                  "type": {
+                    "typeClass": "BooleanType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                }
+              ],
+              "subEntities": []
+            },
+            {
+              "id": 16,
+              "name": "Product",
+              "quantity": 50,
+              "projectId": 12,
+              "attributes": [
+                {
+                  "id": 115,
+                  "name": "productId",
+                  "type": {
+                    "typeClass": "IntegerType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "SequentialGenerator",
+                    "startValue": 1
+                  }
+                },
+                {
+                  "id": 116,
+                  "name": "name",
+                  "type": {
+                    "typeClass": "StringType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 117,
+                  "name": "price",
+                  "type": {
+                    "typeClass": "FloatType"
+                  },
+                  "constraints": [
+                    {
+                      "constraintClass": "MinMaxConstraint",
+                      "max": 9999.99,
+                      "min": 0.01
+                    }
+                  ],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 118,
+                  "name": "category",
+                  "type": {
+                    "typeClass": "EnumType",
+                    "values": [
+                      "Electronics",
+                      "Clothing",
+                      "Food",
+                      "Books"
+                    ]
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 119,
+                  "name": "inStock",
+                  "type": {
+                    "typeClass": "BooleanType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                },
+                {
+                  "id": 120,
+                  "name": "createdAt",
+                  "type": {
+                    "typeClass": "DateType"
+                  },
+                  "constraints": [
+                    {
+                      "constraintClass": "MinMaxConstraint",
+                      "max": 1735689600000,
+                      "min": 1577836800000
+                    }
+                  ],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                }
+              ],
+              "subEntities": []
+            }
+          ],
+          "url": "http://localhost/api/projects/12/entities",
+          "responseTime": 15
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200",
+            "status": "pass",
+            "uid": "L_jjfFXQ8S4XjOm6zbrR5"
+          },
+          {
+            "description": "Response should be an array",
+            "status": "pass",
+            "uid": "QpxNlQJ8lXBsUIty90kPi"
+          },
+          {
+            "description": "Should have 2 entities (User and Product)",
+            "status": "pass",
+            "uid": "f7VbKXT0uaFnfsIcpgfb0"
+          },
+          {
+            "description": "Should contain User entity",
+            "status": "pass",
+            "uid": "YRaARzlVx0HYV7j8YY509"
+          },
+          {
+            "description": "Should contain Product entity",
+            "status": "pass",
+            "uid": "KpbEl3hg_ZlglmZLxFobX"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1330006,
+        "name": "08 - List Project Entities",
+        "path": "IntegrationScenario\\08 - List Project Entities",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationScenario\\09 - Cleanup - Delete Project.bru"
+        },
+        "request": {
+          "method": "DELETE",
+          "url": "http://localhost:8081/api/projects/12",
+          "headers": {}
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "date": "Wed, 18 Feb 2026 09:09:40 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "",
+          "url": "http://localhost/api/projects/12",
+          "responseTime": 30
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 204 or 200",
+            "status": "pass",
+            "uid": "79SW9tOYdTXahFHp4O-o8"
+          },
+          {
+            "description": "Project should be deleted successfully",
+            "status": "pass",
+            "uid": "Uv1XoSSHgsh1AlCzzr4fu"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1502368,
+        "name": "09 - Cleanup - Delete Project",
+        "path": "IntegrationScenario\\09 - Cleanup - Delete Project",
+        "iterationIndex": 0
+      }
+    ],
+    "summary": {
+      "totalRequests": 9,
+      "passedRequests": 9,
+      "failedRequests": 0,
+      "errorRequests": 0,
+      "skippedRequests": 0,
+      "totalAssertions": 0,
+      "passedAssertions": 0,
+      "failedAssertions": 0,
+      "totalTests": 37,
+      "passedTests": 37,
+      "failedTests": 0,
+      "totalPreRequestTests": 0,
+      "passedPreRequestTests": 0,
+      "failedPreRequestTests": 0,
+      "totalPostResponseTests": 0,
+      "passedPostResponseTests": 0,
+      "failedPostResponseTests": 0
+    }
+  }
+]

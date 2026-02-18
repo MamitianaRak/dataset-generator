@@ -1,0 +1,99 @@
+meta {
+  name: 02 - Add User Entity
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/projects/{{current_project_id}}/entities
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "User",
+    "quantity": 10,
+    "attributes": [
+      {
+        "name": "id",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "SequentialGenerator",
+          "start": 1,
+          "step": 1
+        }
+      },
+      {
+        "name": "name",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 100
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "age",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 18,
+            "max": 65
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "email",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 255
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "EmailGenerator"
+        }
+      }
+    ],
+    "subEntities": []
+  }
+}
+
+tests {
+  test("Status code should be 201", function() {
+    expect(res.status).to.equal(201);
+  });
+
+  test("Response should contain entity ID", function() {
+    expect(res.body).to.have.property('id');
+    expect(res.body.id).to.be.a('number');
+  });
+
+  test("Response should contain entity name", function() {
+    expect(res.body).to.have.property('name');
+    expect(res.body.name).to.equal('User');
+  });
+
+  test("Response should contain 4 attributes", function() {
+    expect(res.body.attributes).to.be.an('array');
+    expect(res.body.attributes.length).to.equal(4);
+  });
+
+  // Store entity ID for next requests
+  bru.setEnvVar("current_entity_id", res.body.id);
+}

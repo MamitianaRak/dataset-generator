@@ -1,0 +1,25 @@
+meta {
+  name: 07 - Export XML
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/projects/{{current_project_id}}/export?format=xml&count=10
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Content-Type should be application/xml", function() {
+    expect(res.headers['content-type']).to.include('application/xml');
+  });
+
+  test("Response should not be empty", function() {
+    expect(res.body).to.not.be.empty;
+  });
+}
