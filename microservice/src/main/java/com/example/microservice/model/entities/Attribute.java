@@ -17,7 +17,9 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "Attributes")
+@Table(name = "Attributes", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"data_entity_id", "name"})
+})
 public class Attribute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,12 +2,16 @@ package com.example.microservice.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -83,6 +87,104 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère les erreurs de type de paramètre invalide (400 - Bad Request).
+     * Ex: ID non numérique dans l'URL (/projects/abc au lieu de /projects/1).
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
+
+        String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
+                ex.getValue(),
+                ex.getName(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Gère les erreurs de paramètre manquant dans l'URL (400 - Bad Request).
+     * Ex: Variable de chemin requise mais non fournie.
+     */
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPathVariable(
+            MissingPathVariableException ex,
+            HttpServletRequest request) {
+
+        String message = String.format("Missing required path variable: %s", ex.getVariableName());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Gère les violations de contraintes d'intégrité (409 - Conflict).
+     * Ex: Duplicate entry pour une contrainte unique.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request) {
+
+        String message = "Data integrity violation";
+
+        if (ex.getCause() != null && ex.getCause().getCause() != null) {
+            String causeMessage = ex.getCause().getCause().getMessage();
+            if (causeMessage != null && causeMessage.contains("Unique index or primary key violation")) {
+                message = "A resource with this name already exists";
+            } else if (causeMessage != null && causeMessage.contains("duplicate")) {
+                message = "A resource with this name already exists";
+            }
+        }
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * Gère les erreurs de ressource non trouvée (404 - Not Found).
+     * Ex: URL invalide ou route inexistante.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            NoResourceFoundException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message("Resource not found: " + request.getRequestURI())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
      * Gère les erreurs de parsing JSON (400 - Bad Request).
      * Ex: JSON malformé, type inconnu dans @JsonSubTypes.
      */
@@ -93,7 +195,6 @@ public class GlobalExceptionHandler {
 
         String message = "Invalid JSON format or unknown type";
 
-        // Extraire un message plus précis si possible
         if (ex.getCause() != null && ex.getCause().getMessage() != null) {
             String causeMessage = ex.getCause().getMessage();
             if (causeMessage.contains("Could not resolve type id")) {
@@ -122,6 +223,15 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
+        System.err.println("=== UNHANDLED EXCEPTION ===");
+        System.err.println("Exception type: " + ex.getClass().getName());
+        System.err.println("Message: " + ex.getMessage());
+        if (ex.getCause() != null) {
+            System.err.println("Cause type: " + ex.getCause().getClass().getName());
+            System.err.println("Cause message: " + ex.getCause().getMessage());
+        }
+        ex.printStackTrace();
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -129,9 +239,6 @@ public class GlobalExceptionHandler {
                 .message("An unexpected error occurred")
                 .path(request.getRequestURI())
                 .build();
-
-        // Log l'erreur pour debug
-        ex.printStackTrace();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

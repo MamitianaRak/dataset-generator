@@ -12,7 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@Table(name = "DataEntities")
+@Table(name = "DataEntities", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"project_id", "name"})
+})
 public class DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

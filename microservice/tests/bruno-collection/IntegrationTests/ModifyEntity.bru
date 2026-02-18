@@ -1,0 +1,110 @@
+meta {
+  name: 3 - Modify Entity
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/entities/{{current_entity_id}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "CustomerUpdated",
+    "quantity": 25,
+    "attributes": [
+      {
+        "name": "id",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "SequentialGenerator",
+          "start": 100,
+          "step": 1
+        }
+      },
+      {
+        "name": "fullName",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 100
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "age",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [
+          {
+            "constraintClass": "MinMaxConstraint",
+            "min": 21,
+            "max": 65
+          }
+        ],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      },
+      {
+        "name": "email",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 150
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "EmailGenerator"
+        }
+      },
+      {
+        "name": "isActive",
+        "type": {
+          "typeClass": "BooleanType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "RandomGenerator"
+        }
+      }
+    ],
+    "subEntities": []
+  }
+}
+
+tests {
+  test("Status code should be 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Response should contain entity ID", function() {
+    expect(res.body).to.have.property('id');
+  });
+
+  test("Entity name should be updated", function() {
+    expect(res.body.name).to.equal('CustomerUpdated');
+  });
+
+  test("Entity quantity should be updated to 25", function() {
+    expect(res.body.quantity).to.equal(25);
+  });
+
+  test("Attributes should be updated (5 attributes now)", function() {
+    expect(res.body).to.have.property('attributes');
+    expect(res.body.attributes).to.be.an('array');
+    expect(res.body.attributes.length).to.equal(5);
+  });
+}

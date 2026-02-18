@@ -82,8 +82,8 @@ public class DataEntityMapper {
         entity.setName(dto.getName());
         entity.setQuantity(dto.getQuantity());
 
+        // Note: attributes are cleared in the service before calling this method
         if (dto.getAttributes() != null) {
-            entity.getAttributes().clear();
             dto.getAttributes().stream()
                     .map(this::toAttribute)
                     .forEach(entity::addAttribute);

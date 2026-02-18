@@ -63,6 +63,11 @@ public class DataEntityServiceImpl implements DataEntityService {
         DataEntity entity = dataEntityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("DataEntity not found with id: " + id));
 
+        // Clear old attributes and flush to avoid unique constraint violation
+        entity.getAttributes().clear();
+        dataEntityRepository.saveAndFlush(entity);
+
+        // Now update with new data
         dataEntityMapper.updateEntityFromDTO(dto, entity);
         DataEntity updatedEntity = dataEntityRepository.save(entity);
         return dataEntityMapper.toResponseDTO(updatedEntity);
