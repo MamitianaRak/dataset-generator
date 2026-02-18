@@ -1,0 +1,2253 @@
+[
+  {
+    "iterationIndex": 0,
+    "results": [
+      {
+        "test": {
+          "filename": "ErrorTests\\404 - Get Project Not Found.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/999999",
+          "headers": {}
+        },
+        "response": {
+          "status": 404,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.198Z",
+            "status": 404,
+            "error": "Not Found",
+            "message": "Project not found with id: 999999",
+            "path": "/api/projects/999999"
+          },
+          "url": "http://localhost/api/projects/999999",
+          "responseTime": 78
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 404",
+            "status": "pass",
+            "uid": "UOFf9l5VXFV_0D8CO64ZB"
+          },
+          {
+            "description": "Response should contain error message",
+            "status": "pass",
+            "uid": "edo0fo1vaEZkw23ElLFmy"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.244932,
+        "name": "404 - Get Project Not Found",
+        "path": "ErrorTests\\404 - Get Project Not Found",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\400 - Create Project Without Name.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"\"\n}"
+        },
+        "response": {
+          "status": 400,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "connection": "close"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.371Z",
+            "status": 400,
+            "error": "Bad Request",
+            "message": "name: Project name is required",
+            "path": "/api/projects"
+          },
+          "url": "http://localhost/api/projects",
+          "responseTime": 14
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 400",
+            "status": "pass",
+            "uid": "2YzqJGLwJ8Z9-00KOmKic"
+          },
+          {
+            "description": "Response should indicate validation error",
+            "status": "pass",
+            "uid": "vo6mFXRD8pF1l-pvN3IUz"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0788568,
+        "name": "400 - Create Project Without Name",
+        "path": "ErrorTests\\400 - Create Project Without Name",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\400 - Create Entity Invalid Constraint.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/1/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"InvalidEntity\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"invalidAge\",\n      \"quantity\": 1,\n      \"type\": {\n        \"type\": \"IntegerType\"\n      },\n      \"constraints\": [\n        {\n          \"type\": \"MinMaxConstraint\",\n          \"min\": 90.0,\n          \"max\": 18.0\n        }\n      ],\n      \"generator\": {\n        \"type\": \"RandomGenerator\"\n      }\n    }\n  ]\n}"
+        },
+        "response": {
+          "status": 400,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "connection": "close"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.450Z",
+            "status": 400,
+            "error": "Bad Request",
+            "message": "Invalid JSON format or unknown type",
+            "path": "/api/projects/1/entities"
+          },
+          "url": "http://localhost/api/projects/1/entities",
+          "responseTime": 13
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 400",
+            "status": "pass",
+            "uid": "ilyfod4Pk-aorxmFw7mKt"
+          },
+          {
+            "description": "Response should indicate constraint validation error",
+            "status": "pass",
+            "uid": "0LH7fT_svkbnHuoHrIPsR"
+          },
+          {
+            "description": "Should not allow min greater than max",
+            "status": "pass",
+            "uid": "Uz3iuBKtbrq5moIr8-jtD"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1079683,
+        "name": "400 - Create Entity Invalid Constraint (min > max)",
+        "path": "ErrorTests\\400 - Create Entity Invalid Constraint",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\400 - Create Entity Unknown Type.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/1/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"EntityWithUnknownType\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"unknownField\",\n      \"quantity\": 1,\n      \"type\": {\n        \"type\": \"UnknownType\"\n      },\n      \"constraints\": [],\n      \"generator\": {\n        \"type\": \"RandomGenerator\"\n      }\n    }\n  ]\n}"
+        },
+        "response": {
+          "status": 400,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "connection": "close"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.556Z",
+            "status": 400,
+            "error": "Bad Request",
+            "message": "Invalid JSON format or unknown type",
+            "path": "/api/projects/1/entities"
+          },
+          "url": "http://localhost/api/projects/1/entities",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 400",
+            "status": "pass",
+            "uid": "pwcvOAOUYB-wIiAHVQR6A"
+          },
+          {
+            "description": "Response should indicate unknown type error",
+            "status": "pass",
+            "uid": "CEEr-pZsJQXyqK_Qxdq1e"
+          },
+          {
+            "description": "Should reject unknown field type",
+            "status": "pass",
+            "uid": "-613DqaUuhAZTlEK2hva7"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0624006,
+        "name": "400 - Create Entity Unknown Type",
+        "path": "ErrorTests\\400 - Create Entity Unknown Type",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\404 - Get Entity Not Found.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/entities/999999",
+          "headers": {}
+        },
+        "response": {
+          "status": 404,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.616Z",
+            "status": 404,
+            "error": "Not Found",
+            "message": "DataEntity not found with id: 999999",
+            "path": "/api/entities/999999"
+          },
+          "url": "http://localhost/api/entities/999999",
+          "responseTime": 8
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 404",
+            "status": "pass",
+            "uid": "NaGTvk_wvOn9dVTP-Kahm"
+          },
+          {
+            "description": "Response should contain error information",
+            "status": "pass",
+            "uid": "XBtf88JrWFf1fNYIh0yju"
+          },
+          {
+            "description": "Should not return entity data",
+            "status": "pass",
+            "uid": "I8RwG5YZKVRBogd1_j0Hi"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0615733,
+        "name": "404 - Get Entity Not Found",
+        "path": "ErrorTests\\404 - Get Entity Not Found",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\404 - Delete Project Not Found.bru"
+        },
+        "request": {
+          "method": "DELETE",
+          "url": "http://localhost:8081/api/projects/999999",
+          "headers": {}
+        },
+        "response": {
+          "status": 404,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "timestamp": "2026-02-18T10:53:21.677Z",
+            "status": 404,
+            "error": "Not Found",
+            "message": "Project not found with id: 999999",
+            "path": "/api/projects/999999"
+          },
+          "url": "http://localhost/api/projects/999999",
+          "responseTime": 8
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 404",
+            "status": "pass",
+            "uid": "FX2V2fFFvu0VBDVV1Pl0d"
+          },
+          {
+            "description": "Should not return success status",
+            "status": "pass",
+            "uid": "kVaSawdOllwRbJtB2YUpm"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.062367,
+        "name": "404 - Delete Project Not Found",
+        "path": "ErrorTests\\404 - Delete Project Not Found",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "ErrorTests\\409 - Create Duplicate Project.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Project Test\"\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 29,
+            "name": "Project Test",
+            "dateCreated": "2026-02-18T09:53:21.737Z",
+            "lastUpdated": "2026-02-18T09:53:21.737Z"
+          },
+          "url": "http://localhost/api/projects",
+          "responseTime": 8
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 409 Conflict",
+            "status": "fail",
+            "error": "expected 201 to equal 409",
+            "uid": "upDGZg0xJ94itqH45mgTJ"
+          },
+          {
+            "description": "Error response should have correct structure",
+            "status": "fail",
+            "error": "expected { id: 29, name: 'Project Test', …(2) } to have property 'status'",
+            "uid": "udzCjJ_V0p3NDcw_myXDZ"
+          },
+          {
+            "description": "Error should indicate conflict",
+            "status": "fail",
+            "error": "expected undefined to equal 'Conflict'",
+            "uid": "GtzmZT71AW2k0FVOG3-ki"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0834393,
+        "name": "409 - Create Duplicate Project",
+        "path": "ErrorTests\\409 - Create Duplicate Project",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\CreateProject.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Integration Test Project - {{Date.now()}}\"\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 30,
+            "name": "Integration Test Project - {{Date.now()}}",
+            "dateCreated": "2026-02-18T09:53:21.823Z",
+            "lastUpdated": "2026-02-18T09:53:21.823Z"
+          },
+          "url": "http://localhost/api/projects",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201 Created",
+            "status": "pass",
+            "uid": "s0VKrqJlVk-uYEn_Xt27H"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "qnhdyQb8iyWWL3pgwwJEu"
+          },
+          {
+            "description": "Response should contain project name",
+            "status": "pass",
+            "uid": "uV3Yj4-7EUhB-m5qpyTXd"
+          },
+          {
+            "description": "Response should have dateCreated",
+            "status": "pass",
+            "uid": "-5BVgg1XUFYlAYGQ7UxKJ"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1001525,
+        "name": "1 - Create Project",
+        "path": "IntegrationTests\\CreateProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\AddEntity.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/30/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Customer\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 1,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"firstName\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 50\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"age\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 18,\n          \"max\": 80\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 100\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"EmailGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:21 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 31,
+            "name": "Customer",
+            "quantity": 10,
+            "projectId": 30,
+            "attributes": [
+              {
+                "id": 242,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 243,
+                "name": "firstName",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 244,
+                "name": "age",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 80,
+                    "min": 18
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 245,
+                "name": "email",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "EmailGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/projects/30/entities",
+          "responseTime": 79
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201 Created",
+            "status": "pass",
+            "uid": "mdh6vBMXSkEcKwqOuWKV5"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "t8xzkpeF0NkCPD-kdnrDS"
+          },
+          {
+            "description": "Response should contain entity name",
+            "status": "pass",
+            "uid": "ZNwHnw7RwpoAeL-sgUP13"
+          },
+          {
+            "description": "Response should contain attributes",
+            "status": "pass",
+            "uid": "2oyOxUgDTKBZUqZe47oe4"
+          },
+          {
+            "description": "Entity quantity should be 10",
+            "status": "pass",
+            "uid": "-n-qDmK7BCT8LPHD2cdSa"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.2091229,
+        "name": "2 - Add Entity",
+        "path": "IntegrationTests\\AddEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\ModifyEntity.bru"
+        },
+        "request": {
+          "method": "PUT",
+          "url": "http://localhost:8081/api/entities/31",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"CustomerUpdated\",\n  \"quantity\": 25,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 100,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"fullName\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 100\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"age\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [\n        {\n          \"constraintClass\": \"MinMaxConstraint\",\n          \"min\": 21,\n          \"max\": 65\n        }\n      ],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 150\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"EmailGenerator\"\n      }\n    },\n    {\n      \"name\": \"isActive\",\n      \"type\": {\n        \"typeClass\": \"BooleanType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 31,
+            "name": "CustomerUpdated",
+            "quantity": 25,
+            "projectId": 30,
+            "attributes": [
+              {
+                "id": 246,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 247,
+                "name": "fullName",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 248,
+                "name": "age",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [
+                  {
+                    "constraintClass": "MinMaxConstraint",
+                    "max": 65,
+                    "min": 21
+                  }
+                ],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              },
+              {
+                "id": 249,
+                "name": "email",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "EmailGenerator"
+                }
+              },
+              {
+                "id": 250,
+                "name": "isActive",
+                "type": {
+                  "typeClass": "BooleanType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/entities/31",
+          "responseTime": 27
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "zAZ1JdhtMvWiX-o2sogiF"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "dca6tvvrZR4zfqc3Bt-SB"
+          },
+          {
+            "description": "Entity name should be updated",
+            "status": "pass",
+            "uid": "SvBs8w-lAgo1k2oLxrDG5"
+          },
+          {
+            "description": "Entity quantity should be updated to 25",
+            "status": "pass",
+            "uid": "ljm51Ep9SHdMVR8-RC0Kl"
+          },
+          {
+            "description": "Attributes should be updated (5 attributes now)",
+            "status": "pass",
+            "uid": "hujbge_TlzZDoNvT6vANd"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0945078,
+        "name": "3 - Modify Entity",
+        "path": "IntegrationTests\\ModifyEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\PreviewData.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/30/preview",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "projectId": 30,
+            "projectName": "Integration Test Project - {{Date.now()}}",
+            "data": [
+              {
+                "entityName": "CustomerUpdated",
+                "records": [
+                  {
+                    "fields": {
+                      "fullName": "1e3417bd",
+                      "id": 1,
+                      "isActive": false,
+                      "age": 41,
+                      "email": "jane.williams@hotmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "8b170ec9",
+                      "id": 2,
+                      "isActive": false,
+                      "age": 46,
+                      "email": "isabelle.rodriguez@mail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "7cd1eb6b",
+                      "id": 3,
+                      "isActive": false,
+                      "age": 44,
+                      "email": "olivia.davis@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "d5b4dfe4",
+                      "id": 4,
+                      "isActive": true,
+                      "age": 28,
+                      "email": "sam.davis@yahoo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "fb79c15c",
+                      "id": 5,
+                      "isActive": true,
+                      "age": 23,
+                      "email": "henry.davis@demo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "3c90fc01",
+                      "id": 6,
+                      "isActive": true,
+                      "age": 31,
+                      "email": "john.taylor@hotmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "364e34f4",
+                      "id": 7,
+                      "isActive": false,
+                      "age": 41,
+                      "email": "kate.davis@test.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "389af755",
+                      "id": 8,
+                      "isActive": true,
+                      "age": 55,
+                      "email": "leo.smith@gmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "30cc0188",
+                      "id": 9,
+                      "isActive": false,
+                      "age": 35,
+                      "email": "jack.rodriguez@email.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "cb22b720",
+                      "id": 10,
+                      "isActive": true,
+                      "age": 44,
+                      "email": "quinn.williams@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "98aeecb1",
+                      "id": 11,
+                      "isActive": false,
+                      "age": 30,
+                      "email": "david.wilson@example.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "75df6126",
+                      "id": 12,
+                      "isActive": false,
+                      "age": 38,
+                      "email": "charlie.smith@outlook.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "b79dd768",
+                      "id": 13,
+                      "isActive": false,
+                      "age": 22,
+                      "email": "peter.smith@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "e3ee0cd7",
+                      "id": 14,
+                      "isActive": true,
+                      "age": 21,
+                      "email": "bob.johnson@email.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "9d6bdadb",
+                      "id": 15,
+                      "isActive": false,
+                      "age": 33,
+                      "email": "isabelle.jones@yahoo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "66533b74",
+                      "id": 16,
+                      "isActive": true,
+                      "age": 46,
+                      "email": "emma.martinez@yahoo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "da88b52b",
+                      "id": 17,
+                      "isActive": true,
+                      "age": 50,
+                      "email": "grace.davis@icloud.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "d415b751",
+                      "id": 18,
+                      "isActive": false,
+                      "age": 28,
+                      "email": "jack.lopez@test.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "69b502cb",
+                      "id": 19,
+                      "isActive": false,
+                      "age": 47,
+                      "email": "charlie.williams@demo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "5f87ab2a",
+                      "id": 20,
+                      "isActive": false,
+                      "age": 30,
+                      "email": "sam.moore@demo.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "10aa0344",
+                      "id": 21,
+                      "isActive": true,
+                      "age": 63,
+                      "email": "bob.lopez@outlook.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "fcc5d5b1",
+                      "id": 22,
+                      "isActive": false,
+                      "age": 21,
+                      "email": "grace.anderson@hotmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "4af95920",
+                      "id": 23,
+                      "isActive": true,
+                      "age": 30,
+                      "email": "david.anderson@outlook.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "00beb4c8",
+                      "id": 24,
+                      "isActive": true,
+                      "age": 39,
+                      "email": "jack.johnson@hotmail.com"
+                    }
+                  },
+                  {
+                    "fields": {
+                      "fullName": "fd94d852",
+                      "id": 25,
+                      "isActive": true,
+                      "age": 22,
+                      "email": "alice.jackson@example.com"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "url": "http://localhost/api/projects/30/preview",
+          "responseTime": 9
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "nJX59wEnP4rMUsqPq6hVC"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "9cO_fnZkJ5FhE541dxlyi"
+          },
+          {
+            "description": "Response should contain project name",
+            "status": "pass",
+            "uid": "drAic34DLSI4WlTvhcRT6"
+          },
+          {
+            "description": "Response should contain generated data array",
+            "status": "pass",
+            "uid": "XHgNDoLlh9uUZzuqoemk2"
+          },
+          {
+            "description": "Data should contain entity with records",
+            "status": "pass",
+            "uid": "onwZDnSz16Sb3LXRPJnDl"
+          },
+          {
+            "description": "Entity should have 25 records (updated quantity)",
+            "status": "pass",
+            "uid": "VYRLHT7p8bPCmfAniUArK"
+          },
+          {
+            "description": "Records should have the expected attributes",
+            "status": "pass",
+            "uid": "XbJd2V8-LHBXghCzRhq-T"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.113829,
+        "name": "4 - Preview Data",
+        "path": "IntegrationTests\\PreviewData",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\ExportJSON.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/30/export?format=json",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-disposition": "attachment; filename=dataset_30.json",
+            "accept-ranges": "bytes",
+            "content-type": "application/json",
+            "content-length": "2285",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "CustomerUpdated": [
+              {
+                "fullName": "7e422b7b",
+                "id": 1,
+                "isActive": false,
+                "age": 40,
+                "email": "david.williams@mail.com"
+              },
+              {
+                "fullName": "363ea94a",
+                "id": 2,
+                "isActive": true,
+                "age": 36,
+                "email": "nathan.jones@demo.com"
+              },
+              {
+                "fullName": "46663106",
+                "id": 3,
+                "isActive": false,
+                "age": 36,
+                "email": "alice.jones@icloud.com"
+              },
+              {
+                "fullName": "b30ed28e",
+                "id": 4,
+                "isActive": true,
+                "age": 55,
+                "email": "maria.jackson@hotmail.com"
+              },
+              {
+                "fullName": "de47c8ad",
+                "id": 5,
+                "isActive": false,
+                "age": 37,
+                "email": "jane.moore@yahoo.com"
+              },
+              {
+                "fullName": "31a6648b",
+                "id": 6,
+                "isActive": false,
+                "age": 49,
+                "email": "rachel.lopez@icloud.com"
+              },
+              {
+                "fullName": "d4ee3de0",
+                "id": 7,
+                "isActive": false,
+                "age": 62,
+                "email": "emma.martin@test.com"
+              },
+              {
+                "fullName": "d4d1811f",
+                "id": 8,
+                "isActive": false,
+                "age": 56,
+                "email": "nathan.davis@example.com"
+              },
+              {
+                "fullName": "082fbf6e",
+                "id": 9,
+                "isActive": true,
+                "age": 50,
+                "email": "leo.smith@mail.com"
+              },
+              {
+                "fullName": "b0ef2646",
+                "id": 10,
+                "isActive": true,
+                "age": 32,
+                "email": "peter.thomas@example.com"
+              },
+              {
+                "fullName": "9b99c17e",
+                "id": 11,
+                "isActive": true,
+                "age": 40,
+                "email": "grace.smith@hotmail.com"
+              },
+              {
+                "fullName": "04a806d1",
+                "id": 12,
+                "isActive": false,
+                "age": 42,
+                "email": "frank.johnson@example.com"
+              },
+              {
+                "fullName": "cc3fd950",
+                "id": 13,
+                "isActive": true,
+                "age": 27,
+                "email": "david.thomas@hotmail.com"
+              },
+              {
+                "fullName": "d3f6f6d6",
+                "id": 14,
+                "isActive": true,
+                "age": 51,
+                "email": "isabelle.thomas@hotmail.com"
+              },
+              {
+                "fullName": "e89e39ec",
+                "id": 15,
+                "isActive": false,
+                "age": 27,
+                "email": "tara.martin@example.com"
+              },
+              {
+                "fullName": "a0b77564",
+                "id": 16,
+                "isActive": false,
+                "age": 29,
+                "email": "olivia.wilson@mail.com"
+              },
+              {
+                "fullName": "9dffdf55",
+                "id": 17,
+                "isActive": true,
+                "age": 51,
+                "email": "uma.brown@hotmail.com"
+              },
+              {
+                "fullName": "5854defb",
+                "id": 18,
+                "isActive": false,
+                "age": 41,
+                "email": "sam.taylor@hotmail.com"
+              },
+              {
+                "fullName": "5a98948d",
+                "id": 19,
+                "isActive": false,
+                "age": 61,
+                "email": "frank.martin@gmail.com"
+              },
+              {
+                "fullName": "dba772e5",
+                "id": 20,
+                "isActive": false,
+                "age": 29,
+                "email": "sam.rodriguez@email.com"
+              },
+              {
+                "fullName": "f0352f1e",
+                "id": 21,
+                "isActive": true,
+                "age": 64,
+                "email": "emma.johnson@hotmail.com"
+              },
+              {
+                "fullName": "c2a19b17",
+                "id": 22,
+                "isActive": true,
+                "age": 45,
+                "email": "alice.jones@icloud.com"
+              },
+              {
+                "fullName": "828c97b2",
+                "id": 23,
+                "isActive": true,
+                "age": 22,
+                "email": "kate.lopez@outlook.com"
+              },
+              {
+                "fullName": "915dd3a2",
+                "id": 24,
+                "isActive": false,
+                "age": 21,
+                "email": "jack.davis@mail.com"
+              },
+              {
+                "fullName": "f46c567e",
+                "id": 25,
+                "isActive": false,
+                "age": 48,
+                "email": "maria.brown@mail.com"
+              }
+            ]
+          },
+          "url": "http://localhost/api/projects/30/export?format=json",
+          "responseTime": 34
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "zpsjMRwqJg4w2_v4V2AOB"
+          },
+          {
+            "description": "Content-Type should be application/json",
+            "status": "pass",
+            "uid": "OFIos5x0zMQojZdbvz_dx"
+          },
+          {
+            "description": "Content-Disposition should indicate file attachment",
+            "status": "pass",
+            "uid": "RpyiA23pYV05G1eCwPCDc"
+          },
+          {
+            "description": "Response body should exist and contain data",
+            "status": "pass",
+            "uid": "Uq_2I_zml46BjndNlHOOp"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.107254,
+        "name": "5 - Export JSON",
+        "path": "IntegrationTests\\ExportJSON",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "IntegrationTests\\CleanupDeleteProject.bru"
+        },
+        "request": {
+          "method": "DELETE",
+          "url": "http://localhost:8081/api/projects/30",
+          "headers": {}
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "",
+          "url": "http://localhost/api/projects/30",
+          "responseTime": 9
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 204 No Content",
+            "status": "pass",
+            "uid": "2ByAB9QI9RglmYKS3iEWD"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1406649,
+        "name": "6 - Cleanup Delete Project",
+        "path": "IntegrationTests\\CleanupDeleteProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\ListProjects.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": [
+            {
+              "id": 2,
+              "name": "Integration Test Project - {{Math.floor(Date.now() / 1000)}}",
+              "dateCreated": "2026-02-18T08:51:42.227Z",
+              "lastUpdated": "2026-02-18T08:51:42.227Z"
+            },
+            {
+              "id": 7,
+              "name": "My Dataset Project",
+              "dateCreated": "2026-02-18T08:53:54.138Z",
+              "lastUpdated": "2026-02-18T08:53:54.138Z"
+            },
+            {
+              "id": 11,
+              "name": "My Dataset Project",
+              "dateCreated": "2026-02-18T09:09:22.427Z",
+              "lastUpdated": "2026-02-18T09:09:22.427Z"
+            },
+            {
+              "id": 26,
+              "name": "Project Test",
+              "dateCreated": "2026-02-18T09:46:44.196Z",
+              "lastUpdated": "2026-02-18T09:46:44.196Z"
+            },
+            {
+              "id": 27,
+              "name": "Project Test",
+              "dateCreated": "2026-02-18T09:46:55.394Z",
+              "lastUpdated": "2026-02-18T09:46:55.394Z"
+            },
+            {
+              "id": 29,
+              "name": "Project Test",
+              "dateCreated": "2026-02-18T09:53:21.737Z",
+              "lastUpdated": "2026-02-18T09:53:21.737Z"
+            }
+          ],
+          "url": "http://localhost/api/projects",
+          "responseTime": 24
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "Ub_hXhCcrT1nRUQjFgJ4i"
+          },
+          {
+            "description": "Response should be an array",
+            "status": "pass",
+            "uid": "wn81-5kM3BMfX_6Nby73w"
+          },
+          {
+            "description": "Array items should have required fields",
+            "status": "pass",
+            "uid": "zQ1R8FYegg-iiZkKFc_vu"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1109655,
+        "name": "1 - List Projects",
+        "path": "UnitTests\\ListProjects",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\CreateProject.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Unit Test Project\"\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 31,
+            "name": "Unit Test Project",
+            "dateCreated": "2026-02-18T09:53:22.700Z",
+            "lastUpdated": "2026-02-18T09:53:22.700Z"
+          },
+          "url": "http://localhost/api/projects",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201 Created",
+            "status": "pass",
+            "uid": "Ct7ISc8ZYjaqPzlM8zGuj"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "5z17vSChp-ZKnLkch-SBJ"
+          },
+          {
+            "description": "Response should contain project name",
+            "status": "pass",
+            "uid": "M1yofUhCE6f01wghhJUlB"
+          },
+          {
+            "description": "Response should have dateCreated",
+            "status": "pass",
+            "uid": "KDuKzxPEvud5b9GZpEKNb"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1576182,
+        "name": "2 - Create Project",
+        "path": "UnitTests\\CreateProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\GetProject.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/31",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 31,
+            "name": "Unit Test Project",
+            "dateCreated": "2026-02-18T09:53:22.700Z",
+            "lastUpdated": "2026-02-18T09:53:22.700Z"
+          },
+          "url": "http://localhost/api/projects/31",
+          "responseTime": 5
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "3V3hGfsxfyAmnXCQECU6d"
+          },
+          {
+            "description": "Response should contain project details",
+            "status": "pass",
+            "uid": "KSl0jWfIQoKp5qmJ5kcl0"
+          },
+          {
+            "description": "Project ID should be a number",
+            "status": "pass",
+            "uid": "fbOsxIybpOUkpfgQSbGof"
+          },
+          {
+            "description": "Project name should be a string",
+            "status": "pass",
+            "uid": "TPA1TECblC3B4DQtyddWZ"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0624008,
+        "name": "3 - Get Project",
+        "path": "UnitTests\\GetProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\UpdateProject.bru"
+        },
+        "request": {
+          "method": "PUT",
+          "url": "http://localhost:8081/api/projects/31",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"Updated Unit Test Project\"\n}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:22 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 31,
+            "name": "Updated Unit Test Project",
+            "dateCreated": "2026-02-18T09:53:22.700Z",
+            "lastUpdated": "2026-02-18T09:53:22.700Z"
+          },
+          "url": "http://localhost/api/projects/31",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "yya2sFZoR7-jYdDV2R36S"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "G-4h_ewlQ6gIUpTXtSBWj"
+          },
+          {
+            "description": "Project name should be updated",
+            "status": "pass",
+            "uid": "d-qxUl4MD61zYymmhy9wH"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0932552,
+        "name": "4 - Update Project",
+        "path": "UnitTests\\UpdateProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\DeleteProject.bru"
+        },
+        "request": {
+          "method": "DELETE",
+          "url": "http://localhost:8081/api/projects/31",
+          "headers": {}
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "",
+          "url": "http://localhost/api/projects/31",
+          "responseTime": 7
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 204 No Content",
+            "status": "pass",
+            "uid": "HUUegk3CjxKZnvf9K-dA1"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1414085,
+        "name": "5 - Delete Project",
+        "path": "UnitTests\\DeleteProject",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\CreateEntity.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://localhost:8081/api/projects/2/entities",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"UnitTestEntity\",\n  \"quantity\": 10,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 1,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"name\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 50\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"RandomGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 201,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 32,
+            "name": "UnitTestEntity",
+            "quantity": 10,
+            "projectId": 2,
+            "attributes": [
+              {
+                "id": 251,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 252,
+                "name": "name",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/projects/2/entities",
+          "responseTime": 11
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 201 Created",
+            "status": "pass",
+            "uid": "a2Xq1iYtmQJfy0RjrYjsW"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "awJyZZznOe8kVakz4HnTn"
+          },
+          {
+            "description": "Response should contain entity name",
+            "status": "pass",
+            "uid": "rHpVem7TSpceKhARJnquv"
+          },
+          {
+            "description": "Response should contain attributes array",
+            "status": "pass",
+            "uid": "McBrU0gNKD8kdAW_xiNJX"
+          },
+          {
+            "description": "Entity quantity should match",
+            "status": "pass",
+            "uid": "ZxtaS3eeD-MbAvvtWpbBX"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.1338337,
+        "name": "6 - Create Entity",
+        "path": "UnitTests\\CreateEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\ListEntities.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/2/entities",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": [
+            {
+              "id": 32,
+              "name": "UnitTestEntity",
+              "quantity": 10,
+              "projectId": 2,
+              "attributes": [
+                {
+                  "id": 251,
+                  "name": "id",
+                  "type": {
+                    "typeClass": "IntegerType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "SequentialGenerator",
+                    "startValue": 1
+                  }
+                },
+                {
+                  "id": 252,
+                  "name": "name",
+                  "type": {
+                    "typeClass": "StringType"
+                  },
+                  "constraints": [],
+                  "quantity": 1,
+                  "generator": {
+                    "generatorClass": "RandomGenerator"
+                  }
+                }
+              ],
+              "subEntities": []
+            }
+          ],
+          "url": "http://localhost/api/projects/2/entities",
+          "responseTime": 11
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "pEf90hhvpjDfWUBdnlaVy"
+          },
+          {
+            "description": "Response should be an array",
+            "status": "pass",
+            "uid": "hkOmRfFEP2fqTFT_Thce9"
+          },
+          {
+            "description": "Entities should have required fields",
+            "status": "pass",
+            "uid": "AHOVjDJv8__82otN19Sdu"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0704635,
+        "name": "7 - List Entities",
+        "path": "UnitTests\\ListEntities",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\GetEntity.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/entities/32",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 32,
+            "name": "UnitTestEntity",
+            "quantity": 10,
+            "projectId": 2,
+            "attributes": [
+              {
+                "id": 251,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 252,
+                "name": "name",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "RandomGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/entities/32",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "ZZFUoq1CpBMY6MR9JmZVG"
+          },
+          {
+            "description": "Response should contain entity details",
+            "status": "pass",
+            "uid": "F9RYs9H1IbvNx7osaPU9B"
+          },
+          {
+            "description": "Entity ID should be a number",
+            "status": "pass",
+            "uid": "NEbP9sOou7dOc7oXxTr-8"
+          },
+          {
+            "description": "Attributes should be an array",
+            "status": "pass",
+            "uid": "NLg-CHc7t0qZ7z2E7h_Ah"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0943582,
+        "name": "8 - Get Entity",
+        "path": "UnitTests\\GetEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\UpdateEntity.bru"
+        },
+        "request": {
+          "method": "PUT",
+          "url": "http://localhost:8081/api/entities/32",
+          "headers": {
+            "content-type": "application/json"
+          },
+          "data": "{\n  \"name\": \"UpdatedUnitTestEntity\",\n  \"quantity\": 20,\n  \"attributes\": [\n    {\n      \"name\": \"id\",\n      \"type\": {\n        \"typeClass\": \"IntegerType\"\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"SequentialGenerator\",\n        \"start\": 100,\n        \"step\": 1\n      }\n    },\n    {\n      \"name\": \"email\",\n      \"type\": {\n        \"typeClass\": \"StringType\",\n        \"maxLength\": 100\n      },\n      \"constraints\": [],\n      \"quantity\": 1,\n      \"generator\": {\n        \"generatorClass\": \"EmailGenerator\"\n      }\n    }\n  ],\n  \"subEntities\": []\n}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "id": 32,
+            "name": "UpdatedUnitTestEntity",
+            "quantity": 20,
+            "projectId": 2,
+            "attributes": [
+              {
+                "id": 253,
+                "name": "id",
+                "type": {
+                  "typeClass": "IntegerType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "SequentialGenerator",
+                  "startValue": 1
+                }
+              },
+              {
+                "id": 254,
+                "name": "email",
+                "type": {
+                  "typeClass": "StringType"
+                },
+                "constraints": [],
+                "quantity": 1,
+                "generator": {
+                  "generatorClass": "EmailGenerator"
+                }
+              }
+            ],
+            "subEntities": []
+          },
+          "url": "http://localhost/api/entities/32",
+          "responseTime": 12
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "RK2miC75N4oSY4M32nF7g"
+          },
+          {
+            "description": "Response should contain entity ID",
+            "status": "pass",
+            "uid": "efj1y3_9aE-SxikvK6xXz"
+          },
+          {
+            "description": "Entity name should be updated",
+            "status": "pass",
+            "uid": "eqzEm8DLMJIbLJZrEoHix"
+          },
+          {
+            "description": "Entity quantity should be updated",
+            "status": "pass",
+            "uid": "ezWPZrYY9FhQRggPKTJ5H"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0766114,
+        "name": "9 - Update Entity",
+        "path": "UnitTests\\UpdateEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\DeleteEntity.bru"
+        },
+        "request": {
+          "method": "DELETE",
+          "url": "http://localhost:8081/api/entities/32",
+          "headers": {}
+        },
+        "response": {
+          "status": 204,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "",
+          "url": "http://localhost/api/entities/32",
+          "responseTime": 6
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 204 No Content",
+            "status": "pass",
+            "uid": "BGw9MqN7lB15bIDtmzXuk"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.148547,
+        "name": "10 - Delete Entity",
+        "path": "UnitTests\\DeleteEntity",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\PreviewData.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/2/preview",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-type": "application/json",
+            "transfer-encoding": "chunked",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {
+            "projectId": 2,
+            "projectName": "Integration Test Project - {{Math.floor(Date.now() / 1000)}}",
+            "data": []
+          },
+          "url": "http://localhost/api/projects/2/preview",
+          "responseTime": 7
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "inQ0rkUL7ecQClDni6WzN"
+          },
+          {
+            "description": "Response should contain project ID",
+            "status": "pass",
+            "uid": "PbVkp4csOf15dXvlr4ozN"
+          },
+          {
+            "description": "Response should contain project name",
+            "status": "pass",
+            "uid": "_OuSIqd-el47Wrt0mfsHC"
+          },
+          {
+            "description": "Response should contain data array",
+            "status": "pass",
+            "uid": "hgck4AIejq2nr2cxETddN"
+          },
+          {
+            "description": "Data items should have entityName and records",
+            "status": "pass",
+            "uid": "5QX33hOW7AW_LIZbXz76l"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0744174,
+        "name": "11 - Preview Data",
+        "path": "UnitTests\\PreviewData",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\ExportJSON.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/2/export?format=json",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-disposition": "attachment; filename=dataset_2.json",
+            "accept-ranges": "bytes",
+            "content-type": "application/json",
+            "content-length": "2",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": {},
+          "url": "http://localhost/api/projects/2/export?format=json",
+          "responseTime": 9
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "XP2RkOPTarPySXNtIH4BX"
+          },
+          {
+            "description": "Content-Type should be application/json",
+            "status": "pass",
+            "uid": "ZWOKC7Ytap8xa44KRSFHZ"
+          },
+          {
+            "description": "Content-Disposition should indicate file attachment",
+            "status": "pass",
+            "uid": "5wF8I_izoPO01IplJ6yiz"
+          },
+          {
+            "description": "Response body should exist",
+            "status": "pass",
+            "uid": "xsR2-8itMh9O5YViDrwhv"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0608617,
+        "name": "12 - Export JSON",
+        "path": "UnitTests\\ExportJSON",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "UnitTests\\ExportXML.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:8081/api/projects/2/export?format=xml",
+          "headers": {}
+        },
+        "response": {
+          "status": 200,
+          "statusText": "",
+          "headers": {
+            "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+            "content-disposition": "attachment; filename=dataset_2.xml",
+            "accept-ranges": "bytes",
+            "content-type": "application/xml",
+            "content-length": "60",
+            "date": "Wed, 18 Feb 2026 09:53:23 GMT",
+            "keep-alive": "timeout=60",
+            "connection": "keep-alive"
+          },
+          "data": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<dataset>\n</dataset>\n",
+          "url": "http://localhost/api/projects/2/export?format=xml",
+          "responseTime": 7
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [
+          {
+            "description": "Status code should be 200 OK",
+            "status": "pass",
+            "uid": "v4NfnwUJg3Q8HvZEH6Zuf"
+          },
+          {
+            "description": "Content-Type should be application/xml",
+            "status": "pass",
+            "uid": "bOfcFmBkFezZRwrr74q8T"
+          },
+          {
+            "description": "Content-Disposition should indicate file attachment",
+            "status": "pass",
+            "uid": "TiUFHEro6lCXQ6kC-PfJq"
+          },
+          {
+            "description": "Response body should exist",
+            "status": "pass",
+            "uid": "f3wxe-7wk4d4dMkFQz0PE"
+          }
+        ],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.0953863,
+        "name": "13 - Export XML",
+        "path": "UnitTests\\ExportXML",
+        "iterationIndex": 0
+      }
+    ],
+    "summary": {
+      "totalRequests": 26,
+      "passedRequests": 25,
+      "failedRequests": 1,
+      "errorRequests": 0,
+      "skippedRequests": 0,
+      "totalAssertions": 0,
+      "passedAssertions": 0,
+      "failedAssertions": 0,
+      "totalTests": 89,
+      "passedTests": 86,
+      "failedTests": 3,
+      "totalPreRequestTests": 0,
+      "passedPreRequestTests": 0,
+      "failedPreRequestTests": 0,
+      "totalPostResponseTests": 0,
+      "passedPostResponseTests": 0,
+      "failedPostResponseTests": 0
+    }
+  }
+]

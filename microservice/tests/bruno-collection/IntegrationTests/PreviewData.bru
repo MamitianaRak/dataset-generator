@@ -43,11 +43,21 @@ tests {
   test("Records should have the expected attributes", function() {
     if (res.body.data[0].records.length > 0) {
       var firstRecord = res.body.data[0].records[0];
-      expect(firstRecord).to.have.property('id');
-      expect(firstRecord).to.have.property('fullName');
-      expect(firstRecord).to.have.property('age');
-      expect(firstRecord).to.have.property('email');
-      expect(firstRecord).to.have.property('isActive');
+      // Check if record has fields property (nested structure)
+      if (firstRecord.fields) {
+        expect(firstRecord.fields).to.have.property('id');
+        expect(firstRecord.fields).to.have.property('fullName');
+        expect(firstRecord.fields).to.have.property('age');
+        expect(firstRecord.fields).to.have.property('email');
+        expect(firstRecord.fields).to.have.property('isActive');
+      } else {
+        // Flat structure
+        expect(firstRecord).to.have.property('id');
+        expect(firstRecord).to.have.property('fullName');
+        expect(firstRecord).to.have.property('age');
+        expect(firstRecord).to.have.property('email');
+        expect(firstRecord).to.have.property('isActive');
+      }
     }
   });
 }

@@ -10,9 +10,13 @@ post {
   auth: none
 }
 
+vars:pre-request {
+  timestamp: {{Date.now()}}
+}
+
 body:json {
   {
-    "name": "Unit Test Project"
+    "name": "Unit Test Project - {{timestamp}}"
   }
 }
 
@@ -28,7 +32,7 @@ tests {
 
   test("Response should contain project name", function() {
     expect(res.body).to.have.property('name');
-    expect(res.body.name).to.equal('Unit Test Project');
+    expect(res.body.name).to.include('Unit Test Project');
   });
 
   test("Response should have dateCreated", function() {

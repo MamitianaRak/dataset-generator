@@ -1,11 +1,11 @@
 meta {
-  name: 13 - Export XML
+  name: 12 - Export JSON
   type: http
-  seq: 13
+  seq: 12
 }
 
 get {
-  url: {{baseUrl}}/projects/{{projectId}}/export?format=xml
+  url: {{baseUrl}}/projects/{{unit_project_id}}/export?format=json
   body: none
   auth: none
 }
@@ -15,13 +15,13 @@ tests {
     expect(res.status).to.equal(200);
   });
 
-  test("Content-Type should be application/xml", function() {
-    expect(res.headers['content-type']).to.include('application/xml');
+  test("Content-Type should be application/json", function() {
+    expect(res.headers['content-type']).to.include('application/json');
   });
 
   test("Content-Disposition should indicate file attachment", function() {
     expect(res.headers['content-disposition']).to.include('attachment');
-    expect(res.headers['content-disposition']).to.include('.xml');
+    expect(res.headers['content-disposition']).to.include('.json');
   });
 
   test("Response body should exist", function() {

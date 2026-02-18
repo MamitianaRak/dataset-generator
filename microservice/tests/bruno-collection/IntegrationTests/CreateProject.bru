@@ -10,9 +10,13 @@ post {
   auth: none
 }
 
+vars:pre-request {
+  timestamp: {{Date.now()}}
+}
+
 body:json {
   {
-    "name": "Project Test"
+    "name": "Integration Test Project - {{timestamp}}"
   }
 }
 
