@@ -1,0 +1,21 @@
+meta {
+  name: 10 - Delete Entity
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/entities/{{unit_entity_id}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 204 No Content", function() {
+    expect(res.status).to.equal(204);
+  });
+}
+
+script:post-response {
+  bru.setEnvVar("unit_entity_id", "");
+}

@@ -1,0 +1,64 @@
+meta {
+  name: 9 - Update Entity
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/entities/{{unit_entity_id}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "UpdatedUnitTestEntity",
+    "quantity": 20,
+    "attributes": [
+      {
+        "name": "id",
+        "type": {
+          "typeClass": "IntegerType"
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "SequentialGenerator",
+          "start": 100,
+          "step": 1
+        }
+      },
+      {
+        "name": "email",
+        "type": {
+          "typeClass": "StringType",
+          "maxLength": 100
+        },
+        "constraints": [],
+        "quantity": 1,
+        "generator": {
+          "generatorClass": "EmailGenerator"
+        }
+      }
+    ],
+    "subEntities": []
+  }
+}
+
+tests {
+  test("Status code should be 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Response should contain entity ID", function() {
+    expect(res.body).to.have.property('id');
+  });
+
+  test("Entity name should be updated", function() {
+    expect(res.body.name).to.equal('UpdatedUnitTestEntity');
+  });
+
+  test("Entity quantity should be updated", function() {
+    expect(res.body.quantity).to.equal(20);
+  });
+}
