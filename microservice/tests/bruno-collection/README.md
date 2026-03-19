@@ -1,172 +1,118 @@
-# Bruno Collection - Spring REST Microservice API
+# Bruno Collection - Tests API REST
 
-Collection de tests pour l'API REST du microservice de génération de données.
+Collection de tests Bruno pour le microservice de generation de datasets.
 
 ## Configuration
 
-### Variables d'environnement (Local)
-- `baseUrl`: http://localhost:8081/api
-- `current_project_id`: défini automatiquement après `CreateProject`
-- `current_entity_id`: défini automatiquement après `AddEntity`
+### Environnement : MicroService
 
-## Ordre d'exécution recommandé
+| Variable             | Valeur                        | Description                       |
+|----------------------|-------------------------------|-----------------------------------|
+| `baseUrl`            | `http://localhost:8081/api`   | URL de base de l'API              |
+| `projectId`          | `1`                           | ID projet pour tests unitaires    |
+| `entityId`           | `1`                           | ID entite pour tests unitaires    |
+| `current_project_id` | (dynamique)                   | Defini par IntegrationTests       |
+| `current_entity_id`  | (dynamique)                   | Defini par IntegrationTests       |
 
-### 1. Projects
-1. **Create Project** - Crée un nouveau projet
-2. **List Projects** - Liste tous les projets
-3. **Get Project** - Récupère les détails d'un projet
-4. **Update Project** - Modifie le nom d'un projet
-5. **Delete Project** - Supprime un projet
+## Structure des tests
 
-### 2. Entities
-1. **Create Entity - User** - Crée une entité User avec attributs polymorphiques
-   - IntegerType avec SequentialGenerator (id)
-   - IntegerType avec MinMaxConstraint (age)
-   - StringType (email)
+### Dossier A - UnitTests (13 tests)
 
-2. **Create Entity - Product** - Crée une entité Product avec tous les types
-   - IntegerType (productId)
-   - StringType (name)
-   - FloatType avec MinMaxConstraint (price)
-   - EnumType (category)
-   - BooleanType (inStock)
-   - DateType avec MinMaxConstraint (createdAt)
+Tests isoles sur chaque endpoint avec des donnees valides.
 
-3. **List Entities in Project** - Liste toutes les entités d'un projet
-4. **Get Entity** - Récupère les détails d'une entité
-5. **Update Entity** - Modifie une entité (ajout d'attributs)
-6. **Delete Entity** - Supprime une entité
+| # | Test           | Methode | Endpoint                                   |
+|---|----------------|---------|---------------------------------------------|
+| 1 | ListProjects   | GET     | `/projects`                                 |
+| 2 | GetProject     | GET     | `/projects/{projectId}`                     |
+| 3 | CreateProject  | POST    | `/projects`                                 |
+| 4 | UpdateProject  | PUT     | `/projects/{projectId}`                     |
+| 5 | DeleteProject  | DELETE  | `/projects/{projectId}`                     |
+| 6 | ListEntities   | GET     | `/projects/{projectId}/entities`            |
+| 7 | GetEntity      | GET     | `/entities/{entityId}`                      |
+| 8 | CreateEntity   | POST    | `/projects/{projectId}/entities`            |
+| 9 | UpdateEntity   | PUT     | `/entities/{entityId}`                      |
+| 10| DeleteEntity   | DELETE  | `/entities/{entityId}`                      |
+| 11| PreviewData    | GET     | `/projects/{projectId}/preview`             |
+| 12| ExportJSON     | GET     | `/projects/{projectId}/export?format=json`  |
+| 13| ExportXML      | GET     | `/projects/{projectId}/export?format=xml`   |
 
-### 3. Generation & Export
-1. **Preview Data** - Génère un aperçu JSON des données
-2. **Export JSON** - Télécharge les données en format JSON
-3. **Export XML** - Télécharge les données en format XML
-4. **Export SQL** - Télécharge les données en format SQL
+### Dossier B - ErrorTests (7 tests)
 
-## Exemples de types polymorphiques
+Tests de gestion des erreurs (pas de 500 pour des erreurs client).
 
-### IntegerType
+| Test                                  | Code | Description                          |
+|---------------------------------------|------|--------------------------------------|
+| 400 - Create Project Without Name     | 400  | POST projet sans nom                 |
+| 400 - Create Entity Invalid Constraint| 400  | min > max dans MinMaxConstraint      |
+| 400 - Create Entity Unknown Type      | 400  | typeClass inconnu                    |
+| 404 - Get Project Not Found           | 404  | GET projet inexistant (id=999999)    |
+| 404 - Get Entity Not Found            | 404  | GET entite inexistante (id=999999)   |
+| 404 - Delete Project Not Found        | 404  | DELETE projet inexistant             |
+| 409 - Create Duplicate Project        | 409  | POST projet avec nom deja existant   |
+
+### Dossier C - IntegrationTests (6 tests - Scenario Nominal)
+
+Scenario complet "Happy Path" avec chainage de variables. Idempotent (rejouable a l'infini).
+
+| Seq | Test                 | Description                                          |
+|-----|----------------------|------------------------------------------------------|
+| 1   | CreateProject        | Cree un projet (nom unique avec timestamp)           |
+| 2   | AddEntity            | Ajoute une entite avec 3 attributs + FakerGenerator  |
+| 3   | ModifyEntity         | Modifie l'entite (5 attributs, quantite 25)          |
+| 4   | PreviewData          | Verifie la generation des donnees                    |
+| 5   | ExportJSON           | Telecharge l'export JSON                             |
+| 6   | CleanupDeleteProject | Supprime le projet (nettoyage pour idempotence)      |
+
+## Types polymorphiques (JSON)
+
+### Types (`typeClass`)
 ```json
-{
-  "typeClass": "IntegerType"
-}
+{ "typeClass": "IntegerType" }
+{ "typeClass": "FloatType" }
+{ "typeClass": "StringType" }
+{ "typeClass": "BooleanType" }
+{ "typeClass": "DateType" }
+{ "typeClass": "EnumType", "values": ["val1", "val2"] }
 ```
 
-### FloatType
+### Contraintes (`constraintClass`)
 ```json
-{
-  "typeClass": "FloatType"
-}
+{ "constraintClass": "MinMaxConstraint", "min": 0, "max": 100 }
+{ "constraintClass": "EnumConstraint", "allowed": ["val1", "val2"] }
 ```
 
-### StringType
+### Generateurs (`generatorClass`)
 ```json
-{
-  "typeClass": "StringType",
-  "maxLength": 100
-}
+{ "generatorClass": "FakerGenerator", "locale": "fr" }
+{ "generatorClass": "SequentialGenerator", "startValue": 1 }
 ```
 
-### BooleanType
-```json
-{
-  "typeClass": "BooleanType"
-}
+## Execution CLI
+
+### Prerequis
+- Backend Spring demarre sur `http://localhost:8081`
+- Bruno CLI installe : `npm install -g @usebruno/cli`
+
+### Commandes
+
+```bash
+cd tests/bruno-collection
+
+# Tests d'integration (scenario nominal)
+bru run IntegrationTests --env MicroService
+
+# Tests unitaires
+bru run UnitTests --env MicroService
+
+# Tests d'erreur
+bru run ErrorTests --env MicroService
+
+# Tous les tests + rapport
+bru run IntegrationTests --env MicroService > report-cli.txt
 ```
 
-### DateType
-```json
-{
-  "typeClass": "DateType"
-}
-```
+### Dernier rapport
 
-### EnumType
-```json
-{
-  "typeClass": "EnumType",
-  "values": ["value1", "value2", "value3"]
-}
-```
-
-## Exemples de contraintes
-
-### MinMaxConstraint
-```json
-{
-  "constraintClass": "MinMaxConstraint",
-  "min": 0,
-  "max": 100
-}
-```
-
-### EnumConstraint
-```json
-{
-  "constraintClass": "EnumConstraint",
-  "allowedValues": ["val1", "val2"]
-}
-```
-
-## Exemples de générateurs
-
-### RandomGenerator
-```json
-{
-  "generatorClass": "RandomGenerator"
-}
-```
-
-### SequentialGenerator
-```json
-{
-  "generatorClass": "SequentialGenerator",
-  "start": 1,
-  "step": 1
-}
-```
-
-### EmailGenerator
-```json
-{
-  "generatorClass": "EmailGenerator"
-}
-```
-Génère des emails aléatoires au format prenom.nom@domaine.com (ex: john.smith@gmail.com)
-
-## Automatisation et Rapport (CLI)
-
-Cette collection est exécutable en mode pipeline CI/CD avec Bruno CLI.
-
-### Prérequis
-- Backend Spring démarré
-- Environnement `MicroService` configuré (variable `baseUrl`)
-- Bruno CLI installé
-
-### Exécution CLI (tests d'intégration)
-```powershell
-cd D:\spring-rest-med-amine-mamitiana-1\microservice\tests\bruno-collection
-bru run IntegrationTests --env MicroService --sandbox=developer
-```
-
-### Génération du rapport d'exécution (UTF-8)
-```powershell
-cd D:\spring-rest-med-amine-mamitiana-1\microservice\tests\bruno-collection
-[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-$OutputEncoding = [System.Text.UTF8Encoding]::new()
-bru run IntegrationTests --env MicroService --sandbox=developer | Out-File -FilePath report-cli.txt -Encoding utf8
-```
-
-### Résultat obtenu
-- Statut: PASS
-- Requêtes: 6/6 Passed
-- Tests: 27/27
-- Rapport: `tests/bruno-collection/report-cli.txt`
-
-## Notes
-
-- L'application doit être démarrée sur http://localhost:8081
-- Les IDs de projet et d'entité sont gérés dynamiquement par les scripts Bruno (`current_project_id`, `current_entity_id`)
-- Les dates dans MinMaxConstraint pour DateType sont en millisecondes (epoch timestamp)
-  - 1577836800000 = 2020-01-01
-  - 1735689600000 = 2025-01-01
+Fichier : `report-cli.txt`
+- 6/6 requetes passees
+- 27/27 assertions reussies
