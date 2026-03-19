@@ -33,6 +33,11 @@ public class EnumType extends BaseDataType implements IDataType {
     }
 
     @Override
+    public Object generateRandomInRange(double min, double max) {
+        return generateRandomValue();
+    }
+
+    @Override
     public boolean validate(Object value) {
         if (value == null) return false;
         return values.contains(value.toString());

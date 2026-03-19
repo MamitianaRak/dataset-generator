@@ -3,7 +3,6 @@ package com.example.microservice.model.entities;
 import com.example.microservice.distribution.BaseDistribution;
 import com.example.microservice.generation.BaseDataGenerator;
 import com.example.microservice.model.constraints.BaseConstraint;
-import com.example.microservice.model.interfaces.IConstraint;
 import com.example.microservice.model.types.BaseDataType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -65,11 +64,4 @@ public class Attribute {
         if (constraints != null) this.constraints = constraints;
     }
 
-    public boolean validate(Object value) {
-        if (type != null && !type.validate(value)) return false;
-        for (IConstraint c : constraints) {
-            if (!c.validate(value)) return false;
-        }
-        return true;
-    }
 }

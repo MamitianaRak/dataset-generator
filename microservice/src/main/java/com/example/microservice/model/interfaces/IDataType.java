@@ -5,5 +5,6 @@ package com.example.microservice.model.interfaces;
  */
 public interface IDataType {
     Object generateRandomValue();
+    Object generateRandomInRange(double min, double max);
     boolean validate(Object value);
 }

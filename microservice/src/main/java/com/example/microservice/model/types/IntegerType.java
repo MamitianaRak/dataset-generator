@@ -17,8 +17,12 @@ public class IntegerType extends BaseDataType implements IDataType {
 
     @Override
     public Object generateRandomValue() {
-        // Génère un entier aléatoire dans une plage par défaut
         return rnd.nextInt(1000);
+    }
+
+    @Override
+    public Object generateRandomInRange(double min, double max) {
+        return (int) (min + rnd.nextInt((int) (max - min + 1)));
     }
 
     @Override

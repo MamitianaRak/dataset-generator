@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class DataEntityServiceImpl implements DataEntityService {
+class DataEntityServiceImpl implements DataEntityService {
 
     private final DataEntityRepository dataEntityRepository;
     private final ProjectRepository projectRepository;

@@ -7,14 +7,12 @@ import com.example.microservice.dto.entity.DataEntityUpdateDTO;
 import com.example.microservice.dto.model.constraints.ConstraintDTO;
 import com.example.microservice.dto.model.constraints.EnumConstraintDTO;
 import com.example.microservice.dto.model.constraints.MinMaxConstraintDTO;
-import com.example.microservice.dto.model.generators.EmailGeneratorDTO;
+import com.example.microservice.dto.model.generators.FakerGeneratorDTO;
 import com.example.microservice.dto.model.generators.GeneratorDTO;
-import com.example.microservice.dto.model.generators.RandomGeneratorDTO;
 import com.example.microservice.dto.model.generators.SequentialGeneratorDTO;
 import com.example.microservice.dto.model.types.*;
 import com.example.microservice.generation.BaseDataGenerator;
-import com.example.microservice.generation.EmailDataGenerator;
-import com.example.microservice.generation.RandomDataGenerator;
+import com.example.microservice.generation.FakerDataGenerator;
 import com.example.microservice.generation.SequentialDataGenerator;
 import com.example.microservice.model.constraints.BaseConstraint;
 import com.example.microservice.model.constraints.EnumConstraint;
@@ -24,8 +22,8 @@ import com.example.microservice.model.entities.DataEntity;
 import com.example.microservice.model.types.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +32,72 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DataEntityMapper {
+
+    // Registres Entity → DTO
+    private static final Map<Class<? extends BaseDataType>, Function<BaseDataType, DataTypeDTO>> TYPE_TO_DTO = new LinkedHashMap<>();
+    private static final Map<Class<? extends BaseConstraint>, Function<BaseConstraint, ConstraintDTO>> CONSTRAINT_TO_DTO = new LinkedHashMap<>();
+    private static final Map<Class<? extends BaseDataGenerator>, Function<BaseDataGenerator, GeneratorDTO>> GENERATOR_TO_DTO = new LinkedHashMap<>();
+
+    // Registres DTO → Entity
+    private static final Map<Class<? extends DataTypeDTO>, Function<DataTypeDTO, BaseDataType>> DTO_TO_TYPE = new LinkedHashMap<>();
+    private static final Map<Class<? extends ConstraintDTO>, Function<ConstraintDTO, BaseConstraint>> DTO_TO_CONSTRAINT = new LinkedHashMap<>();
+    private static final Map<Class<? extends GeneratorDTO>, Function<GeneratorDTO, BaseDataGenerator>> DTO_TO_GENERATOR = new LinkedHashMap<>();
+
+    static {
+        // Type Entity → DTO
+        TYPE_TO_DTO.put(IntegerType.class, t -> new IntegerTypeDTO());
+        TYPE_TO_DTO.put(FloatType.class, t -> new FloatTypeDTO());
+        TYPE_TO_DTO.put(StringType.class, t -> new StringTypeDTO());
+        TYPE_TO_DTO.put(BooleanType.class, t -> new BooleanTypeDTO());
+        TYPE_TO_DTO.put(DateType.class, t -> new DateTypeDTO());
+        TYPE_TO_DTO.put(EnumType.class, t -> {
+            EnumTypeDTO dto = new EnumTypeDTO();
+            dto.setValues(((EnumType) t).getValues());
+            return dto;
+        });
+
+        // Type DTO → Entity
+        DTO_TO_TYPE.put(IntegerTypeDTO.class, d -> new IntegerType());
+        DTO_TO_TYPE.put(FloatTypeDTO.class, d -> new FloatType());
+        DTO_TO_TYPE.put(StringTypeDTO.class, d -> new StringType());
+        DTO_TO_TYPE.put(BooleanTypeDTO.class, d -> new BooleanType());
+        DTO_TO_TYPE.put(DateTypeDTO.class, d -> new DateType());
+        DTO_TO_TYPE.put(EnumTypeDTO.class, d -> new EnumType(((EnumTypeDTO) d).getValues()));
+
+        // Constraint Entity → DTO
+        CONSTRAINT_TO_DTO.put(MinMaxConstraint.class, c -> {
+            MinMaxConstraintDTO dto = new MinMaxConstraintDTO();
+            dto.setMin(((MinMaxConstraint) c).getMin());
+            dto.setMax(((MinMaxConstraint) c).getMax());
+            return dto;
+        });
+        CONSTRAINT_TO_DTO.put(EnumConstraint.class, c -> {
+            EnumConstraintDTO dto = new EnumConstraintDTO();
+            dto.setAllowed(((EnumConstraint) c).getAllowed());
+            return dto;
+        });
+
+        // Constraint DTO → Entity
+        DTO_TO_CONSTRAINT.put(MinMaxConstraintDTO.class, d -> new MinMaxConstraint(
+                ((MinMaxConstraintDTO) d).getMin(), ((MinMaxConstraintDTO) d).getMax()));
+        DTO_TO_CONSTRAINT.put(EnumConstraintDTO.class, d -> new EnumConstraint(((EnumConstraintDTO) d).getAllowed()));
+
+        // Generator Entity → DTO
+        GENERATOR_TO_DTO.put(FakerDataGenerator.class, g -> {
+            FakerGeneratorDTO dto = new FakerGeneratorDTO();
+            dto.setLocale(((FakerDataGenerator) g).getFakerLocale());
+            return dto;
+        });
+        GENERATOR_TO_DTO.put(SequentialDataGenerator.class, g -> {
+            SequentialGeneratorDTO dto = new SequentialGeneratorDTO();
+            dto.setStartValue(((SequentialDataGenerator) g).getStartValue());
+            return dto;
+        });
+
+        // Generator DTO → Entity
+        DTO_TO_GENERATOR.put(FakerGeneratorDTO.class, d -> new FakerDataGenerator(((FakerGeneratorDTO) d).getLocale()));
+        DTO_TO_GENERATOR.put(SequentialGeneratorDTO.class, d -> new SequentialDataGenerator(((SequentialGeneratorDTO) d).getStartValue()));
+    }
 
     public DataEntityResponseDTO toResponseDTO(DataEntity entity) {
         if (entity == null) return null;
@@ -124,104 +188,39 @@ public class DataEntityMapper {
         return attribute;
     }
 
-    // Conversion DataType
     private DataTypeDTO toDataTypeDTO(BaseDataType type) {
         if (type == null) return null;
-
-        if (type instanceof IntegerType) {
-            return new IntegerTypeDTO();
-        } else if (type instanceof FloatType) {
-            return new FloatTypeDTO();
-        } else if (type instanceof StringType) {
-            return new StringTypeDTO();
-        } else if (type instanceof BooleanType) {
-            return new BooleanTypeDTO();
-        } else if (type instanceof DateType) {
-            return new DateTypeDTO();
-        } else if (type instanceof EnumType) {
-            EnumTypeDTO dto = new EnumTypeDTO();
-            dto.setValues(((EnumType) type).getValues());
-            return dto;
-        }
-        return null;
+        Function<BaseDataType, DataTypeDTO> converter = TYPE_TO_DTO.get(type.getClass());
+        return converter != null ? converter.apply(type) : null;
     }
 
     private BaseDataType toDataType(DataTypeDTO dto) {
         if (dto == null) return null;
-
-        if (dto instanceof IntegerTypeDTO) {
-            return new IntegerType();
-        } else if (dto instanceof FloatTypeDTO) {
-            return new FloatType();
-        } else if (dto instanceof StringTypeDTO) {
-            return new StringType();
-        } else if (dto instanceof BooleanTypeDTO) {
-            return new BooleanType();
-        } else if (dto instanceof DateTypeDTO) {
-            return new DateType();
-        } else if (dto instanceof EnumTypeDTO) {
-            return new EnumType(((EnumTypeDTO) dto).getValues());
-        }
-        return null;
+        Function<DataTypeDTO, BaseDataType> converter = DTO_TO_TYPE.get(dto.getClass());
+        return converter != null ? converter.apply(dto) : null;
     }
 
-    // Conversion Constraint
     private ConstraintDTO toConstraintDTO(BaseConstraint constraint) {
         if (constraint == null) return null;
-
-        if (constraint instanceof MinMaxConstraint) {
-            MinMaxConstraintDTO dto = new MinMaxConstraintDTO();
-            dto.setMin(((MinMaxConstraint) constraint).getMin());
-            dto.setMax(((MinMaxConstraint) constraint).getMax());
-            return dto;
-        } else if (constraint instanceof EnumConstraint) {
-            EnumConstraintDTO dto = new EnumConstraintDTO();
-            dto.setAllowed(((EnumConstraint) constraint).getAllowed());
-            return dto;
-        }
-        return null;
+        Function<BaseConstraint, ConstraintDTO> converter = CONSTRAINT_TO_DTO.get(constraint.getClass());
+        return converter != null ? converter.apply(constraint) : null;
     }
 
     private BaseConstraint toConstraint(ConstraintDTO dto) {
         if (dto == null) return null;
-
-        if (dto instanceof MinMaxConstraintDTO) {
-            return new MinMaxConstraint(
-                    ((MinMaxConstraintDTO) dto).getMin(),
-                    ((MinMaxConstraintDTO) dto).getMax()
-            );
-        } else if (dto instanceof EnumConstraintDTO) {
-            return new EnumConstraint(((EnumConstraintDTO) dto).getAllowed());
-        }
-        return null;
+        Function<ConstraintDTO, BaseConstraint> converter = DTO_TO_CONSTRAINT.get(dto.getClass());
+        return converter != null ? converter.apply(dto) : null;
     }
 
-    // Conversion Generator
-    private GeneratorDTO toGeneratorDTO(Object generator) {
+    private GeneratorDTO toGeneratorDTO(BaseDataGenerator generator) {
         if (generator == null) return null;
-
-        if (generator instanceof RandomDataGenerator) {
-            return new RandomGeneratorDTO();
-        } else if (generator instanceof SequentialDataGenerator) {
-            SequentialGeneratorDTO dto = new SequentialGeneratorDTO();
-            dto.setStartValue(((SequentialDataGenerator) generator).getStartValue());
-            return dto;
-        } else if (generator instanceof EmailDataGenerator) {
-            return new EmailGeneratorDTO();
-        }
-        return null;
+        Function<BaseDataGenerator, GeneratorDTO> converter = GENERATOR_TO_DTO.get(generator.getClass());
+        return converter != null ? converter.apply(generator) : null;
     }
 
-    private com.example.microservice.generation.BaseDataGenerator toGenerator(GeneratorDTO dto) {
+    private BaseDataGenerator toGenerator(GeneratorDTO dto) {
         if (dto == null) return null;
-
-        if (dto instanceof RandomGeneratorDTO) {
-            return new RandomDataGenerator();
-        } else if (dto instanceof SequentialGeneratorDTO) {
-            return new SequentialDataGenerator(((SequentialGeneratorDTO) dto).getStartValue());
-        } else if (dto instanceof EmailGeneratorDTO) {
-            return new EmailDataGenerator();
-        }
-        return null;
+        Function<GeneratorDTO, BaseDataGenerator> converter = DTO_TO_GENERATOR.get(dto.getClass());
+        return converter != null ? converter.apply(dto) : null;
     }
 }

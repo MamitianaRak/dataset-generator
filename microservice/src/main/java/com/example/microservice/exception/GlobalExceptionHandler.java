@@ -2,6 +2,8 @@ package com.example.microservice.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Gère les erreurs 404 - Ressource non trouvée.
@@ -223,14 +227,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        System.err.println("=== UNHANDLED EXCEPTION ===");
-        System.err.println("Exception type: " + ex.getClass().getName());
-        System.err.println("Message: " + ex.getMessage());
-        if (ex.getCause() != null) {
-            System.err.println("Cause type: " + ex.getCause().getClass().getName());
-            System.err.println("Cause message: " + ex.getCause().getMessage());
-        }
-        ex.printStackTrace();
+        logger.error("Unhandled exception [{}]: {}", ex.getClass().getName(), ex.getMessage(), ex);
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

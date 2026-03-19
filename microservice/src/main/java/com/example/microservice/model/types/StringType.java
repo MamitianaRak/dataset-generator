@@ -18,6 +18,13 @@ public class StringType extends BaseDataType implements IDataType {
     }
 
     @Override
+    public Object generateRandomInRange(double min, double max) {
+        int length = Math.max(1, (int) max);
+        String full = UUID.randomUUID().toString().replace("-", "");
+        return full.substring(0, Math.min(length, full.length()));
+    }
+
+    @Override
     public boolean validate(Object value) {
         return value instanceof String;
     }

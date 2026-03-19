@@ -2,11 +2,9 @@ package com.example.microservice.controller;
 
 import com.example.microservice.dataset.Dataset;
 import com.example.microservice.dto.generation.PreviewResponseDTO;
-import com.example.microservice.export.JSONExporter;
-import com.example.microservice.export.SQLExporter;
-import com.example.microservice.export.XMLExporter;
+import com.example.microservice.export.ExporterFactory;
 import com.example.microservice.export.interfaces.IDataExporter;
-import com.example.microservice.service.ProjectService;
+import com.example.microservice.service.DataGenerationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -19,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Controller pour la génération et l'export de données.
@@ -30,7 +27,8 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class ProjectGenerationController {
 
-    private final ProjectService projectService;
+    private final DataGenerationService dataGenerationService;
+    private final ExporterFactory exporterFactory;
 
     /**
      * Génère un aperçu des données pour un projet.
@@ -38,7 +36,7 @@ public class ProjectGenerationController {
      */
     @GetMapping("/{id}/preview")
     public PreviewResponseDTO generatePreview(@PathVariable("id") Long id) {
-        return projectService.generatePreview(id);
+        return dataGenerationService.generatePreview(id);
     }
 
     /**
@@ -51,37 +49,14 @@ public class ProjectGenerationController {
             @RequestParam(value = "format", defaultValue = "json") String format) throws IOException {
 
         // Générer le dataset
-        Dataset dataset = projectService.generateDataset(id);
+        Dataset dataset = dataGenerationService.generateDataset(id);
 
         // Créer un répertoire temporaire pour l'export
         Path tempDir = Files.createTempDirectory("dataset-export-");
-        String fileName = "dataset_" + id;
-        String filePath;
-        IDataExporter exporter;
-        MediaType mediaType;
-
-        // Choisir l'exporteur selon le format (JSON, XML, SQL uniquement)
-        switch (format.toLowerCase()) {
-            case "xml":
-                fileName += ".xml";
-                filePath = tempDir.resolve(fileName).toString();
-                exporter = new XMLExporter();
-                mediaType = MediaType.APPLICATION_XML;
-                break;
-            case "sql":
-                fileName += ".sql";
-                filePath = tempDir.resolve(fileName).toString();
-                exporter = new SQLExporter();
-                mediaType = MediaType.parseMediaType("application/sql");
-                break;
-            case "json":
-            default:
-                fileName += ".json";
-                filePath = tempDir.resolve(fileName).toString();
-                exporter = new JSONExporter();
-                mediaType = MediaType.APPLICATION_JSON;
-                break;
-        }
+        IDataExporter exporter = exporterFactory.getExporter(format);
+        MediaType mediaType = exporterFactory.getMediaType(format);
+        String fileName = "dataset_" + id + exporterFactory.getExtension(format);
+        String filePath = tempDir.resolve(fileName).toString();
 
         // Exporter les données
         exporter.export(dataset, filePath);

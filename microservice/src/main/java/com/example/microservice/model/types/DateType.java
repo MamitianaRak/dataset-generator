@@ -18,10 +18,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DateType extends BaseDataType implements IDataType {
     @Override
     public Object generateRandomValue() {
-        // Génère une date aléatoire entre 1970 et maintenant
         long startEpoch = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         long endEpoch = Instant.now().toEpochMilli();
         long randomEpoch = ThreadLocalRandom.current().nextLong(startEpoch, endEpoch);
+        return new Date(randomEpoch);
+    }
+
+    @Override
+    public Object generateRandomInRange(double min, double max) {
+        long randomEpoch = ThreadLocalRandom.current().nextLong((long) min, (long) max);
         return new Date(randomEpoch);
     }
 

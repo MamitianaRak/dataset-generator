@@ -14,9 +14,8 @@ import lombok.Data;
     property = "generatorClass"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = RandomGeneratorDTO.class, name = "RandomGenerator"),
-    @JsonSubTypes.Type(value = SequentialGeneratorDTO.class, name = "SequentialGenerator"),
-    @JsonSubTypes.Type(value = EmailGeneratorDTO.class, name = "EmailGenerator")
+    @JsonSubTypes.Type(value = FakerGeneratorDTO.class, name = "FakerGenerator"),
+    @JsonSubTypes.Type(value = SequentialGeneratorDTO.class, name = "SequentialGenerator")
 })
 public abstract class GeneratorDTO {
     // Classe de base pour tous les générateurs

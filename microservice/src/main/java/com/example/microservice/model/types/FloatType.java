@@ -17,8 +17,12 @@ public class FloatType extends BaseDataType implements IDataType {
 
     @Override
     public Object generateRandomValue() {
-        // Génère un double aléatoire entre 0.0 et 1000.0
         return rnd.nextDouble() * 1000.0;
+    }
+
+    @Override
+    public Object generateRandomInRange(double min, double max) {
+        return min + rnd.nextDouble() * (max - min);
     }
 
     @Override
