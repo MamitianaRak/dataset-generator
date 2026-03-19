@@ -1,0 +1,31 @@
+meta {
+  name: 4 - Update Project
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/projects/{{unit_project_id}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Updated Unit Test Project"
+  }
+}
+
+tests {
+  test("Status code should be 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Response should contain project ID", function() {
+    expect(res.body).to.have.property('id');
+  });
+
+  test("Project name should be updated", function() {
+    expect(res.body.name).to.equal('Updated Unit Test Project');
+  });
+}
