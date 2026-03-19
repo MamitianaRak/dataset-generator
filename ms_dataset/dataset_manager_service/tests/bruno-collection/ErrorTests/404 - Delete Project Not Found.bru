@@ -1,0 +1,26 @@
+meta {
+  name: 404 - Delete Project Not Found
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/projects/999999
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:8081/api
+}
+
+tests {
+  test("Status code should be 404", function() {
+    expect(res.status).to.equal(404);
+  });
+
+  test("Should not return success status", function() {
+    expect(res.status).to.not.equal(204);
+    expect(res.status).to.not.equal(200);
+  });
+}

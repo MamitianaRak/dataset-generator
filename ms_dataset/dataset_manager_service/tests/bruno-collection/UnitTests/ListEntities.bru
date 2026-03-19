@@ -1,0 +1,30 @@
+meta {
+  name: 7 - List Entities
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/projects/{{projectId}}/entities
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Response should be an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+
+  test("Entities should have required fields", function() {
+    if (res.body.length > 0) {
+      expect(res.body[0]).to.have.property('id');
+      expect(res.body[0]).to.have.property('name');
+      expect(res.body[0]).to.have.property('quantity');
+      expect(res.body[0]).to.have.property('attributes');
+    }
+  });
+}

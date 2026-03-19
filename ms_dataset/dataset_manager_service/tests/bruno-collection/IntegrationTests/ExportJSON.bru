@@ -1,0 +1,30 @@
+meta {
+  name: 5 - Export JSON
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/projects/{{current_project_id}}/export?format=json
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 200 OK", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("Content-Type should be application/json", function() {
+    expect(res.headers['content-type']).to.include('application/json');
+  });
+
+  test("Content-Disposition should indicate file attachment", function() {
+    expect(res.headers['content-disposition']).to.include('attachment');
+    expect(res.headers['content-disposition']).to.include('.json');
+  });
+
+  test("Response body should exist and contain data", function() {
+    expect(res.body).to.exist;
+  });
+}
