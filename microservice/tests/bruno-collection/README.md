@@ -6,8 +6,8 @@ Collection de tests pour l'API REST du microservice de génération de données.
 
 ### Variables d'environnement (Local)
 - `baseUrl`: http://localhost:8081/api
-- `projectId`: 1 (à modifier après création d'un projet)
-- `entityId`: 1 (à modifier après création d'une entité)
+- `current_project_id`: défini automatiquement après `CreateProject`
+- `current_entity_id`: défini automatiquement après `AddEntity`
 
 ## Ordre d'exécution recommandé
 
@@ -134,11 +134,39 @@ Collection de tests pour l'API REST du microservice de génération de données.
 ```
 Génère des emails aléatoires au format prenom.nom@domaine.com (ex: john.smith@gmail.com)
 
+## Automatisation et Rapport (CLI)
+
+Cette collection est exécutable en mode pipeline CI/CD avec Bruno CLI.
+
+### Prérequis
+- Backend Spring démarré
+- Environnement `MicroService` configuré (variable `baseUrl`)
+- Bruno CLI installé
+
+### Exécution CLI (tests d'intégration)
+```powershell
+cd D:\spring-rest-med-amine-mamitiana-1\microservice\tests\bruno-collection
+bru run IntegrationTests --env MicroService --sandbox=developer
+```
+
+### Génération du rapport d'exécution (UTF-8)
+```powershell
+cd D:\spring-rest-med-amine-mamitiana-1\microservice\tests\bruno-collection
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+$OutputEncoding = [System.Text.UTF8Encoding]::new()
+bru run IntegrationTests --env MicroService --sandbox=developer | Out-File -FilePath report-cli.txt -Encoding utf8
+```
+
+### Résultat obtenu
+- Statut: PASS
+- Requêtes: 6/6 Passed
+- Tests: 27/27
+- Rapport: `tests/bruno-collection/report-cli.txt`
+
 ## Notes
 
 - L'application doit être démarrée sur http://localhost:8081
-- Après avoir créé un projet, mettez à jour la variable `projectId` dans l'environnement
-- Après avoir créé une entité, mettez à jour la variable `entityId` dans l'environnement
+- Les IDs de projet et d'entité sont gérés dynamiquement par les scripts Bruno (`current_project_id`, `current_entity_id`)
 - Les dates dans MinMaxConstraint pour DateType sont en millisecondes (epoch timestamp)
   - 1577836800000 = 2020-01-01
   - 1735689600000 = 2025-01-01

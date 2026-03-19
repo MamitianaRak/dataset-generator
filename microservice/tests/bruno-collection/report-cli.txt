@@ -1,0 +1,60 @@
+﻿IntegrationTests\CreateProject (201 ) - 23 ms
+Project created with ID: 9
+Tests
+   ✓ Status code should be 201 Created
+   ✓ Response should contain project ID
+   ✓ Response should contain project name
+   ✓ Response should have dateCreated
+IntegrationTests\AddEntity (201 ) - 11 ms
+Entity created with ID: 9
+Tests
+   ✓ Status code should be 201 Created
+   ✓ Response should contain entity ID
+   ✓ Response should contain entity name
+   ✓ Response should contain attributes
+   ✓ Entity quantity should be 10
+IntegrationTests\ModifyEntity (200 ) - 20 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain entity ID
+   ✓ Entity name should be updated
+   ✓ Entity quantity should be updated to 25
+   ✓ Attributes should be updated (5 attributes now)
+IntegrationTests\PreviewData (200 ) - 9 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Status code should be 200 OK
+   ✓ Response should contain project ID
+   ✓ Response should contain project name
+   ✓ Response should contain generated data array
+   ✓ Data should contain entity with records
+   ✓ Entity should have 25 records (updated quantity)
+   ✓ Records should have the expected attributes
+IntegrationTests\ExportJSON (200 ) - 19 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Content-Type should be application/json
+   ✓ Content-Disposition should indicate file attachment
+   ✓ Response body should exist and contain data
+IntegrationTests\CleanupDeleteProject (204 ) - 14 ms
+Cleanup completed - Project and Entity IDs cleared
+Tests
+   ✓ Status code should be 204 No Content
+
+📊 Execution Summary
+┌───────────────┬──────────────┐
+│ Metric        │    Result    │
+├───────────────┼──────────────┤
+│ Status        │    ✓ PASS    │
+├───────────────┼──────────────┤
+│ Requests      │ 6 (6 Passed) │
+├───────────────┼──────────────┤
+│ Tests         │    27/27     │
+├───────────────┼──────────────┤
+│ Assertions    │     0/0      │
+├───────────────┼──────────────┤
+│ Duration (ms) │      96      │
+└───────────────┴──────────────┘
+
+From v3.0.0 onwards, the default sandbox mode is changed to safe. Use --sandbox=developer to run in developer mode.
+See additional breaking changes at https://www.usebruno.com/v3-release
