@@ -1,7 +1,7 @@
 meta {
   name: 409 - Create Duplicate Project
   type: http
-  seq: 7
+  seq: 8
 }
 
 post {
@@ -12,7 +12,7 @@ post {
 
 body:json {
   {
-    "name": "Project Test"
+    "name": "DuplicateTestProject"
   }
 }
 
@@ -21,13 +21,23 @@ tests {
     expect(res.status).to.equal(409);
   });
 
-  test("Error response should have correct structure", function() {
+  test("Error response should have correct structure (timestamp, status, error, message, path)", function() {
+    expect(res.body).to.have.property('timestamp');
     expect(res.body).to.have.property('status');
     expect(res.body).to.have.property('error');
     expect(res.body).to.have.property('message');
+    expect(res.body).to.have.property('path');
   });
 
-  test("Error should indicate conflict", function() {
+  test("Error status in body should be 409", function() {
+    expect(res.body.status).to.equal(409);
+  });
+
+  test("Error field should indicate Conflict", function() {
     expect(res.body.error).to.equal('Conflict');
+  });
+
+  test("Message should indicate resource already exists", function() {
+    expect(res.body.message).to.include('already exists');
   });
 }

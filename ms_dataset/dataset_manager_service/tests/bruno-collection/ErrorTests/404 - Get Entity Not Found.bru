@@ -19,11 +19,23 @@ tests {
     expect(res.status).to.equal(404);
   });
 
-  test("Response should contain error information", function() {
-    expect(res.body).to.be.an('object');
+  test("Error response should have correct structure (timestamp, status, error, message, path)", function() {
+    expect(res.body).to.have.property('timestamp');
+    expect(res.body).to.have.property('status');
+    expect(res.body).to.have.property('error');
+    expect(res.body).to.have.property('message');
+    expect(res.body).to.have.property('path');
   });
 
-  test("Should not return entity data", function() {
-    expect(res.status).to.not.equal(200);
+  test("Error status in body should be 404", function() {
+    expect(res.body.status).to.equal(404);
+  });
+
+  test("Error field should indicate Not Found", function() {
+    expect(res.body.error).to.equal('Not Found');
+  });
+
+  test("Message should mention the entity ID", function() {
+    expect(res.body.message).to.include('999999');
   });
 }

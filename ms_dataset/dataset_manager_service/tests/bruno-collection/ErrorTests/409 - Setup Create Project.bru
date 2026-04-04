@@ -1,0 +1,29 @@
+meta {
+  name: 409 - Setup Create Project
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/projects
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "DuplicateTestProject"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.id) {
+    bru.setVar("duplicate_project_id", res.body.id);
+  }
+}
+
+tests {
+  test("Setup: Project created for duplicate test", function() {
+    expect(res.status).to.be.oneOf([201, 409]);
+  });
+}
