@@ -1,6 +1,8 @@
-# Microservice - Generateur de Datasets
+# Dataset Manager Service - Generateur de Datasets
 
 API REST Spring Boot pour la generation automatique de datasets configurables avec export multi-format.
+
+> **Note** : Ce README decrit l'architecture **monolithique** actuelle du service. Une refonte vers une architecture microservices est prévue.
 
 ## Stack Technique
 
@@ -62,10 +64,19 @@ src/main/java/com/example/microservice/
   repository/        # Acces donnees JPA
   model/             # Entites JPA (Project, DataEntity, Attribute, Types, Constraints, Generators)
   dto/               # Data Transfer Objects (separation controleur/entite)
+    entity/          # DTOs pour les entites
+    generation/      # DTOs pour la generation (PreviewResponseDTO, EntityDataDTO, RecordDTO)
+    model/           # DTOs pour types, contraintes, generateurs
+    project/         # DTOs pour les projets
   mapper/            # Conversion DTO <-> Entity (DataEntityMapper, ProjectMapper)
   export/            # Exporteurs (JSON, XML, SQL, CSV) + ExporterFactory
   generation/        # Generateurs de donnees (FakerDataGenerator, SequentialDataGenerator)
     strategy/        # Strategies Faker par domaine (Identity, Contact, Address, Company, etc.)
+  distribution/      # Distributions statistiques (Normal, Uniforme, Aleatoire, Personnalisee)
+  source/            # Sources de donnees externes (API, Fichier, ListeStatique)
+  dataset/           # Representation interne des donnees generees (Dataset, Record)
+  util/              # Classes utilitaires (RecordGenerator)
+  config/            # Configuration Spring (CORS, WebConfig)
   validation/        # Validateurs (AttributeValidator)
   exception/         # Gestion globale des erreurs (GlobalExceptionHandler, ErrorResponse)
 ```
@@ -102,10 +113,34 @@ src/main/java/com/example/microservice/
 | Faker         | `FakerGenerator`       | Donnees realistes via Datafaker (locale: fr/en)  |
 | Sequentiel    | `SequentialGenerator`  | Valeurs incrementales (startValue)              |
 
-Le generateur **Faker** detecte automatiquement le domaine de donnees selon le nom de l'attribut :
-`firstname`, `email`, `phone`, `city`, `country`, `company`, `price`, `url`, etc.
+Le generateur **Faker** detecte automatiquement le domaine de donnees selon le nom de l'attribut via 7 strategies :
+- **Identity** : `firstname`, `lastname`, `fullname`, `ssn`, `passport`
+- **Contact** : `email`, `phone`, `mobile`
+- **Address** : `street`, `city`, `country`, `zipcode`, `state`
+- **Company** : `company`, `industry`, `jobTitle`
+- **Internet** : `url`, `domain`, `text`, `paragraph`, `word`
+- **Commerce** : `price`, `product`, `department`
 
-## Exemple de payload
+### Distributions supportees (module `distribution/`)
+
+| Distribution | Description |
+|--------------|-------------|
+| Normal       | Distribution gaussienne (moyenne, ecart-type) |
+| Uniforme     | Distribution uniforme (tous les nombres equiprobables) |
+| Aleatoire    | Distribution aleatoire simple |
+| Personnalisee| Distribution personnalisable |
+
+### Sources de donnees supportees (module `source/`)
+
+| Source | Description |
+|--------|-------------|
+| API    | Recuperation depuis une API REST externe |
+| Fichier| Lecture depuis un fichier (CSV, JSON, etc.) |
+| ListeStatique | Utilisation d'une liste predéfinie |
+
+## Exemples de payload
+
+### Exemple 1 : Entite simple
 
 ```json
 POST /api/projects/1/entities
@@ -141,6 +176,51 @@ POST /api/projects/1/entities
 }
 ```
 
+### Exemple 2 : Entite avec sous-entites (relation one-to-many)
+
+```json
+POST /api/projects/1/entities
+{
+  "name": "Client",
+  "quantity": 50,
+  "attributes": [
+    {
+      "name": "clientId",
+      "type": { "typeClass": "IntegerType" },
+      "generator": { "generatorClass": "SequentialGenerator", "startValue": 1000 }
+    },
+    {
+      "name": "companyName",
+      "type": { "typeClass": "StringType" },
+      "generator": { "generatorClass": "FakerGenerator" }
+    }
+  ],
+  "subEntities": [
+    {
+      "name": "Commande",
+      "quantity": 3,
+      "attributes": [
+        {
+          "name": "orderId",
+          "type": { "typeClass": "IntegerType" },
+          "generator": { "generatorClass": "SequentialGenerator", "startValue": 1 }
+        },
+        {
+          "name": "amount",
+          "type": { "typeClass": "FloatType" },
+          "constraints": [{ "constraintClass": "MinMaxConstraint", "min": 10.0, "max": 5000.0 }]
+        },
+        {
+          "name": "orderDate",
+          "type": { "typeClass": "DateType" }
+        }
+      ]
+    }
+  ]
+}
+```
+Ce payload genere 50 clients, chacun avec 3 commandes (total: 150 commandes).
+
 ## Gestion des erreurs
 
 | Code | Situation                                      |
@@ -171,7 +251,10 @@ tests/bruno-collection/
 
 ### Dossier A - Tests Unitaires (13 tests)
 
-Tests isoles verifiant chaque endpoint avec des donnees valides.
+Tests isoles verifiant chaque endpoint avec des donnees valides :
+- **Projets** : ListProjects, CreateProject, GetProject, UpdateProject, DeleteProject
+- **Entites** : CreateEntity, ListEntities, GetEntity, UpdateEntity, DeleteEntity
+- **Generation** : PreviewData, ExportJSON, ExportXML (+ ExportCSV et ExportSQL disponibles)
 
 ### Dossier B - Tests d'Erreur (7 tests)
 

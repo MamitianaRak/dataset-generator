@@ -1,26 +1,27 @@
-﻿IntegrationTests\CreateProject (201 ) - 23 ms
-Project created with ID: 9
+=== IntegrationTests ===
+IntegrationTests/CreateProject (201 ) - 52 ms
+Project created with ID: 7
 Tests
    ✓ Status code should be 201 Created
    ✓ Response should contain project ID
    ✓ Response should contain project name
    ✓ Response should have dateCreated
-IntegrationTests\AddEntity (201 ) - 11 ms
-Entity created with ID: 9
+IntegrationTests/AddEntity (201 ) - 19 ms
+Entity created with ID: 3
 Tests
    ✓ Status code should be 201 Created
    ✓ Response should contain entity ID
    ✓ Response should contain entity name
    ✓ Response should contain attributes
    ✓ Entity quantity should be 10
-IntegrationTests\ModifyEntity (200 ) - 20 ms
+IntegrationTests/ModifyEntity (200 ) - 17 ms
 Tests
    ✓ Status code should be 200 OK
    ✓ Response should contain entity ID
    ✓ Entity name should be updated
    ✓ Entity quantity should be updated to 25
    ✓ Attributes should be updated (5 attributes now)
-IntegrationTests\PreviewData (200 ) - 9 ms
+IntegrationTests/PreviewData (200 ) - 10 ms
 Tests
    ✓ Status code should be 200 OK
    ✓ Status code should be 200 OK
@@ -30,13 +31,13 @@ Tests
    ✓ Data should contain entity with records
    ✓ Entity should have 25 records (updated quantity)
    ✓ Records should have the expected attributes
-IntegrationTests\ExportJSON (200 ) - 19 ms
+IntegrationTests/ExportJSON (200 ) - 11 ms
 Tests
    ✓ Status code should be 200 OK
    ✓ Content-Type should be application/json
    ✓ Content-Disposition should indicate file attachment
    ✓ Response body should exist and contain data
-IntegrationTests\CleanupDeleteProject (204 ) - 14 ms
+IntegrationTests/CleanupDeleteProject (204 ) - 11 ms
 Cleanup completed - Project and Entity IDs cleared
 Tests
    ✓ Status code should be 204 No Content
@@ -53,8 +54,163 @@ Tests
 ├───────────────┼──────────────┤
 │ Assertions    │     0/0      │
 ├───────────────┼──────────────┤
-│ Duration (ms) │      96      │
+│ Duration (ms) │     799      │
 └───────────────┴──────────────┘
 
-From v3.0.0 onwards, the default sandbox mode is changed to safe. Use --sandbox=developer to run in developer mode.
-See additional breaking changes at https://www.usebruno.com/v3-release
+=== UnitTests ===
+UnitTests/ListProjects (200 ) - 38 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should be an array
+   ✓ Array items should have required fields
+UnitTests/CreateProject (201 ) - 5 ms
+Tests
+   ✓ Status code should be 201 Created
+   ✓ Response should contain project ID
+   ✓ Response should contain project name
+   ✓ Response should have dateCreated
+UnitTests/GetProject (200 ) - 4 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain project details
+   ✓ Project ID should be a number
+   ✓ Project name should be a string
+UnitTests/UpdateProject (200 ) - 8 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain project ID
+   ✓ Project name should be updated
+UnitTests/DeleteProject (204 ) - 5 ms
+Tests
+   ✓ Status code should be 204 No Content
+UnitTests/CreateEntity (201 ) - 7 ms
+Tests
+   ✓ Status code should be 201 Created
+   ✓ Response should contain entity ID
+   ✓ Response should contain entity name
+   ✓ Response should contain attributes array
+   ✓ Entity quantity should match
+UnitTests/ListEntities (200 ) - 94 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should be an array
+   ✓ Entities should have required fields
+UnitTests/GetEntity (200 ) - 5 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain entity details
+   ✓ Entity ID should be a number
+   ✓ Attributes should be an array
+UnitTests/UpdateEntity (200 ) - 11 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain entity ID
+   ✓ Entity name should be updated
+   ✓ Entity quantity should be updated
+UnitTests/DeleteEntity (204 ) - 37 ms
+Tests
+   ✓ Status code should be 204 No Content
+UnitTests/PreviewData (200 ) - 9 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Response should contain project ID
+   ✓ Response should contain project name
+   ✓ Response should contain data array
+   ✓ Data items should have entityName and records
+UnitTests/ExportJSON (200 ) - 8 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Content-Type should be application/json
+   ✓ Content-Disposition should indicate file attachment
+   ✓ Response body should exist
+UnitTests/ExportXML (200 ) - 8 ms
+Tests
+   ✓ Status code should be 200 OK
+   ✓ Content-Type should be application/xml
+   ✓ Content-Disposition should indicate file attachment
+   ✓ Response body should exist
+
+📊 Execution Summary
+┌───────────────┬────────────────┐
+│ Metric        │     Result     │
+├───────────────┼────────────────┤
+│ Status        │     ✓ PASS     │
+├───────────────┼────────────────┤
+│ Requests      │ 13 (13 Passed) │
+├───────────────┼────────────────┤
+│ Tests         │     45/45      │
+├───────────────┼────────────────┤
+│ Assertions    │      0/0       │
+├───────────────┼────────────────┤
+│ Duration (ms) │      1342      │
+└───────────────┴────────────────┘
+
+=== ErrorTests ===
+ErrorTests/404 - Get Project Not Found (404 ) - 27 ms
+Tests
+   ✓ Status code should be 404
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 404
+   ✓ Error field should indicate Not Found
+   ✓ Message should mention the project ID
+ErrorTests/400 - Create Project Without Name (400 ) - 12 ms
+Tests
+   ✓ Status code should be 400
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 400
+   ✓ Error field should indicate Bad Request
+   ✓ Message should mention project name validation
+ErrorTests/400 - Create Entity Invalid Constraint (400 ) - 13 ms
+Tests
+   ✓ Status code should be 400
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 400
+   ✓ Error field should indicate Bad Request
+   ✓ Should not allow min greater than max
+ErrorTests/400 - Create Entity Unknown Type (400 ) - 4 ms
+Tests
+   ✓ Status code should be 400
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 400
+   ✓ Error field should indicate Bad Request
+   ✓ Message should mention invalid or unknown type
+ErrorTests/404 - Get Entity Not Found (404 ) - 5 ms
+Tests
+   ✓ Status code should be 404
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 404
+   ✓ Error field should indicate Not Found
+   ✓ Message should mention the entity ID
+ErrorTests/404 - Delete Project Not Found (404 ) - 5 ms
+Tests
+   ✓ Status code should be 404
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 404
+   ✓ Error field should indicate Not Found
+   ✓ Message should mention the project ID
+ErrorTests/409 - Setup Create Project (409 ) - 19 ms
+Tests
+   ✓ Setup: Project created for duplicate test
+ErrorTests/409 - Create Duplicate Project (409 ) - 5 ms
+Tests
+   ✓ Status code should be 409 Conflict
+   ✓ Error response should have correct structure (timestamp, status, error, message, path)
+   ✓ Error status in body should be 409
+   ✓ Error field should indicate Conflict
+   ✓ Message should indicate resource already exists
+
+📊 Execution Summary
+┌───────────────┬──────────────┐
+│ Metric        │    Result    │
+├───────────────┼──────────────┤
+│ Status        │    ✓ PASS    │
+├───────────────┼──────────────┤
+│ Requests      │ 8 (8 Passed) │
+├───────────────┼──────────────┤
+│ Tests         │    36/36     │
+├───────────────┼──────────────┤
+│ Assertions    │     0/0      │
+├───────────────┼──────────────┤
+│ Duration (ms) │     669      │
+└───────────────┴──────────────┘
+
