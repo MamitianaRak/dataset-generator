@@ -3,22 +3,3 @@ spring:
     name: gateway
   config:
     import: optional:configserver:http://localhost:8888
-  cloud:
-    gateway:
-      routes:
-        - id: dataset-manager-service
-          uri: lb://dataset-manager
-          predicates:
-            - Path=/DATASET-MANAGER/api/projects/**
-          filters:
-            - RewritePath=/DATASET-MANAGER/api/projects/(?<segment>.*), /api/$\{segment}
-
-        - id: generator-service
-          uri: lb://generator
-          predicates:
-            - Path=/GENERATOR-SERVICE/api/generator/**
-          filters:
-            - RewritePath=/GENERATOR-SERVICE/api/generator/(?<segment>.*), /api/generator/$\{segment}
-
-
-

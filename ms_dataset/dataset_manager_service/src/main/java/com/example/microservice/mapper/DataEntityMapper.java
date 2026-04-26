@@ -7,13 +7,7 @@ import com.example.microservice.dto.entity.DataEntityUpdateDTO;
 import com.example.microservice.dto.model.constraints.ConstraintDTO;
 import com.example.microservice.dto.model.constraints.EnumConstraintDTO;
 import com.example.microservice.dto.model.constraints.MinMaxConstraintDTO;
-import com.example.microservice.dto.model.generators.FakerGeneratorDTO;
-import com.example.microservice.dto.model.generators.GeneratorDTO;
-import com.example.microservice.dto.model.generators.SequentialGeneratorDTO;
 import com.example.microservice.dto.model.types.*;
-import com.example.microservice.generation.BaseDataGenerator;
-import com.example.microservice.generation.FakerDataGenerator;
-import com.example.microservice.generation.SequentialDataGenerator;
 import com.example.microservice.model.constraints.BaseConstraint;
 import com.example.microservice.model.constraints.EnumConstraint;
 import com.example.microservice.model.constraints.MinMaxConstraint;
@@ -36,12 +30,12 @@ public class DataEntityMapper {
     // Registres Entity → DTO
     private static final Map<Class<? extends BaseDataType>, Function<BaseDataType, DataTypeDTO>> TYPE_TO_DTO = new LinkedHashMap<>();
     private static final Map<Class<? extends BaseConstraint>, Function<BaseConstraint, ConstraintDTO>> CONSTRAINT_TO_DTO = new LinkedHashMap<>();
-    private static final Map<Class<? extends BaseDataGenerator>, Function<BaseDataGenerator, GeneratorDTO>> GENERATOR_TO_DTO = new LinkedHashMap<>();
+    // SUPPRIMÉ: GENERATOR_TO_DTO (logique déplacée vers generator-service)
 
     // Registres DTO → Entity
     private static final Map<Class<? extends DataTypeDTO>, Function<DataTypeDTO, BaseDataType>> DTO_TO_TYPE = new LinkedHashMap<>();
     private static final Map<Class<? extends ConstraintDTO>, Function<ConstraintDTO, BaseConstraint>> DTO_TO_CONSTRAINT = new LinkedHashMap<>();
-    private static final Map<Class<? extends GeneratorDTO>, Function<GeneratorDTO, BaseDataGenerator>> DTO_TO_GENERATOR = new LinkedHashMap<>();
+    // SUPPRIMÉ: DTO_TO_GENERATOR (logique déplacée vers generator-service)
 
     static {
         // Type Entity → DTO
@@ -82,21 +76,7 @@ public class DataEntityMapper {
                 ((MinMaxConstraintDTO) d).getMin(), ((MinMaxConstraintDTO) d).getMax()));
         DTO_TO_CONSTRAINT.put(EnumConstraintDTO.class, d -> new EnumConstraint(((EnumConstraintDTO) d).getAllowed()));
 
-        // Generator Entity → DTO
-        GENERATOR_TO_DTO.put(FakerDataGenerator.class, g -> {
-            FakerGeneratorDTO dto = new FakerGeneratorDTO();
-            dto.setLocale(((FakerDataGenerator) g).getFakerLocale());
-            return dto;
-        });
-        GENERATOR_TO_DTO.put(SequentialDataGenerator.class, g -> {
-            SequentialGeneratorDTO dto = new SequentialGeneratorDTO();
-            dto.setStartValue(((SequentialDataGenerator) g).getStartValue());
-            return dto;
-        });
-
-        // Generator DTO → Entity
-        DTO_TO_GENERATOR.put(FakerGeneratorDTO.class, d -> new FakerDataGenerator(((FakerGeneratorDTO) d).getLocale()));
-        DTO_TO_GENERATOR.put(SequentialGeneratorDTO.class, d -> new SequentialDataGenerator(((SequentialGeneratorDTO) d).getStartValue()));
+        // SUPPRIMÉ: Generator mappings (logique déplacée vers generator-service)
     }
 
     public DataEntityResponseDTO toResponseDTO(DataEntity entity) {
@@ -165,7 +145,7 @@ public class DataEntityMapper {
                     attribute.getConstraints().stream().map(this::toConstraintDTO).collect(Collectors.toList()) :
                     new ArrayList<>())
                 .quantity(attribute.getQuantity())
-                .generator(toGeneratorDTO(attribute.getGenerator()))
+                // SUPPRIMÉ: .generator() - logique déplacée vers generator-service
                 .build();
     }
 
@@ -176,7 +156,7 @@ public class DataEntityMapper {
         attribute.setName(dto.getName());
         attribute.setType(toDataType(dto.getType()));
         attribute.setQuantity(dto.getQuantity());
-        attribute.setGenerator(toGenerator(dto.getGenerator()));
+        // SUPPRIMÉ: setGenerator() - logique déplacée vers generator-service
 
         if (dto.getConstraints() != null) {
             List<BaseConstraint> constraints = dto.getConstraints().stream()
@@ -212,15 +192,5 @@ public class DataEntityMapper {
         return converter != null ? converter.apply(dto) : null;
     }
 
-    private GeneratorDTO toGeneratorDTO(BaseDataGenerator generator) {
-        if (generator == null) return null;
-        Function<BaseDataGenerator, GeneratorDTO> converter = GENERATOR_TO_DTO.get(generator.getClass());
-        return converter != null ? converter.apply(generator) : null;
-    }
-
-    private BaseDataGenerator toGenerator(GeneratorDTO dto) {
-        if (dto == null) return null;
-        Function<GeneratorDTO, BaseDataGenerator> converter = DTO_TO_GENERATOR.get(dto.getClass());
-        return converter != null ? converter.apply(dto) : null;
-    }
+    // SUPPRIMÉ: toGeneratorDTO et toGenerator (logique déplacée vers generator-service)
 }

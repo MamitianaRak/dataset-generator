@@ -1,7 +1,6 @@
 package com.example.microservice.model.entities;
 
 import com.example.microservice.distribution.BaseDistribution;
-import com.example.microservice.generation.BaseDataGenerator;
 import com.example.microservice.model.constraints.BaseConstraint;
 import com.example.microservice.model.types.BaseDataType;
 import jakarta.persistence.*;
@@ -41,9 +40,8 @@ public class Attribute {
 
     private int quantity = 0;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "generator_id")
-    private BaseDataGenerator generator;
+    // SUPPRIMÉ: generator n'est plus nécessaire (logique déplacée vers generator-service)
+    // private BaseDataGenerator generator;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "distribution_id")
