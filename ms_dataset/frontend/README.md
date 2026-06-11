@@ -19,9 +19,10 @@ node server.js
 ## Ce que fait le frontend
 
 - **Sidebar** : lister / creer / supprimer des projets (appelle `dataset-manager` port 8081)
-- **Entites** : ajouter / supprimer des entites avec leurs attributs (types, contraintes min/max, enum)
+- **Entites** : ajouter / modifier / supprimer des entites avec leurs attributs (types, contraintes min/max, enum)
+  - Bouton "Modifier" sur chaque entite : ouvre le formulaire pre-rempli et soumet un `PUT /entities/{id}`
 - **Bouton "Pre-remplir entite de demo"** : charge directement l'entite `Utilisateur` (fullName/email/age 18-65) prete a soumettre en un clic
 - **Apercu (preview)** : appelle `generator-service` port 8082, affiche un tableau des donnees generees
   - Badge vert `OK` = tout va bien
   - Badge orange `PARTIAL` = dataset-manager ne repond plus (Circuit Breaker declenche) — exactement le scenario de validation de l'enonce
-- **Export JSON / XML / CSV / SQL** : telecharge le fichier directement depuis `generator-service`
+- **Export JSON / XML** : telecharge le fichier directement depuis `generator-service`

@@ -65,12 +65,28 @@
       .project-list li {
         display: flex; justify-content: space-between; align-items: center;
         padding: 0.5rem 0.6rem; border-radius: 6px; cursor: pointer;
-        font-size: 0.9rem; transition: background 0.12s;
+        font-size: 0.9rem; transition: background 0.12s; gap: 0.3rem;
       }
       .project-list li:hover { background: #ebf4ff; }
       .project-list li.selected { background: #bee3f8; font-weight: 600; color: #2b6cb0; }
       .project-list li.empty { cursor: default; color: #a0aec0; font-size: 0.85rem; justify-content: center; padding: 1rem; }
-      .project-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .project-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+      .project-actions { display: flex; gap: 0.2rem; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }
+      .project-list li:hover .project-actions,
+      .project-list li.selected .project-actions { opacity: 1; }
+      .project-rename-form { display: flex; gap: 0.3rem; flex: 1; min-width: 0; }
+      .project-rename-form input {
+        flex: 1; min-width: 0; border: 1px solid #4299e1;
+        border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.85rem; outline: none;
+      }
+      .project-rename-form button {
+        border-radius: 4px; font-size: 0.75rem; padding: 0.2rem 0.4rem;
+        cursor: pointer; border: 1px solid; white-space: nowrap;
+      }
+      .btn-rename-ok   { background: #4299e1; color: white; border-color: #4299e1; }
+      .btn-rename-ok:hover { background: #3182ce; }
+      .btn-rename-cancel { background: white; color: #718096; border-color: #e2e8f0; }
+      .btn-rename-cancel:hover { background: #f7fafc; }
 
       /* ---- CONTENT ---- */
       .content {
@@ -198,6 +214,11 @@
       .export-json:hover { background: #c6f6d5; }
       .export-xml  { color: #744210; background: #fffff0; border-color: #f6e05e; }
       .export-xml:hover  { background: #fefcbf; }
+      .btn-edit {
+        background: transparent; border: none; color: #4299e1;
+        padding: 0.25rem 0.5rem; font-size: 0.9rem; cursor: pointer;
+      }
+      .btn-edit:hover { color: #2b6cb0; }
 
       /* ---- BANNERS ---- */
       .banner {
@@ -258,9 +279,11 @@
       async function listProjects()              { const r = await fetch(`${MANAGER_URL}/projects`); if (!r.ok) throw await toError(r); return r.json(); }
       async function createProject(name)         { const r = await fetch(`${MANAGER_URL}/projects`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) }); if (!r.ok) throw await toError(r); return r.json(); }
       async function deleteProject(id)           { const r = await fetch(`${MANAGER_URL}/projects/${id}`, {method:'DELETE'}); if (!r.ok) throw await toError(r); }
+      async function updateProject(id, name)     { const r = await fetch(`${MANAGER_URL}/projects/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name}) }); if (!r.ok) throw await toError(r); return r.json(); }
       async function listEntities(pid)           { const r = await fetch(`${MANAGER_URL}/projects/${pid}/entities`); if (!r.ok) throw await toError(r); return r.json(); }
       async function createEntity(pid, entity)   { const r = await fetch(`${MANAGER_URL}/projects/${pid}/entities`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entity) }); if (!r.ok) throw await toError(r); return r.json(); }
       async function deleteEntity(id)            { const r = await fetch(`${MANAGER_URL}/entities/${id}`, {method:'DELETE'}); if (!r.ok) throw await toError(r); }
+      async function updateEntity(id, entity)   { const r = await fetch(`${MANAGER_URL}/entities/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entity) }); if (!r.ok) throw await toError(r); return r.json(); }
       async function previewData(pid)            { const r = await fetch(`${GENERATOR_URL}/${pid}/preview`); if (!r.ok) throw await toError(r); return r.json(); }
       const exportUrl = (pid, fmt) => `${GENERATOR_URL}/${pid}/export?format=${fmt}`;
 
@@ -305,6 +328,25 @@
         };
       }
 
+      // Convertit une entité de l'API vers le format du formulaire
+      function entityToFormState(ent) {
+        return {
+          name: ent.name,
+          quantity: ent.quantity,
+          attributes: (ent.attributes || []).map(a => {
+            const typeClass = a.type?.typeClass || 'StringType';
+            const mmConstraint = (a.constraints || []).find(c => c.constraintClass === 'MinMaxConstraint');
+            return {
+              name: a.name,
+              typeClass,
+              min: mmConstraint ? String(mmConstraint.min) : '',
+              max: mmConstraint ? String(mmConstraint.max) : '',
+              enumValues: typeClass === 'EnumType' && a.type?.values ? a.type.values.join(', ') : '',
+            };
+          }),
+        };
+      }
+
       // ── App ────────────────────────────────────────────────────────────
       function App() {
         const [projects,         setProjects]         = useState([]);
@@ -313,6 +355,9 @@
         const [newProjectName,   setNewProjectName]   = useState('');
         const [newEntity,        setNewEntity]        = useState(emptyEntity());
         const [showForm,         setShowForm]         = useState(false);
+        const [editingEntityId,  setEditingEntityId]  = useState(null);
+        const [renamingId,       setRenamingId]       = useState(null);
+        const [renameValue,      setRenameValue]      = useState('');
         const [preview,          setPreview]          = useState(null);
         const [previewLoading,   setPreviewLoading]   = useState(false);
         const [error,            setError]            = useState(null);
@@ -320,7 +365,7 @@
         useEffect(() => { loadProjects(); }, []);
 
         useEffect(() => {
-          if (selectedId) { loadEntities(selectedId); setPreview(null); setShowForm(false); }
+          if (selectedId) { loadEntities(selectedId); setPreview(null); setShowForm(false); setEditingEntityId(null); setNewEntity(emptyEntity()); }
           else setEntities([]);
         }, [selectedId]);
 
@@ -351,6 +396,23 @@
           catch(e) { setError(e.message); }
         }
 
+        function startRename(p, e) {
+          e.stopPropagation();
+          setRenamingId(p.id);
+          setRenameValue(p.name);
+        }
+
+        async function handleRename(e) {
+          e.preventDefault();
+          if (!renameValue.trim()) return;
+          try {
+            setError(null);
+            await updateProject(renamingId, renameValue.trim());
+            setRenamingId(null);
+            await loadProjects();
+          } catch(e) { setError(e.message); }
+        }
+
         function updateAttr(idx, field, val) {
           setNewEntity(prev => {
             const attrs = [...prev.attributes];
@@ -364,10 +426,26 @@
           if (!selectedId || !newEntity.name.trim()) return;
           try {
             setError(null);
-            await createEntity(selectedId, buildEntityPayload(newEntity));
-            setNewEntity(emptyEntity()); setShowForm(false);
+            if (editingEntityId) {
+              await updateEntity(editingEntityId, buildEntityPayload(newEntity));
+            } else {
+              await createEntity(selectedId, buildEntityPayload(newEntity));
+            }
+            setNewEntity(emptyEntity()); setShowForm(false); setEditingEntityId(null);
             await loadEntities(selectedId);
           } catch(e) { setError(e.message); }
+        }
+
+        function handleEditEntity(ent) {
+          setNewEntity(entityToFormState(ent));
+          setEditingEntityId(ent.id);
+          setShowForm(true);
+        }
+
+        function handleCancelForm() {
+          setShowForm(false);
+          setEditingEntityId(null);
+          setNewEntity(emptyEntity());
         }
 
         async function handleDeleteEntity(id) {
@@ -415,10 +493,22 @@
 
                 <ul className="project-list">
                   {projects.map(p => (
-                    <li key={p.id} className={p.id===selectedId?'selected':''} onClick={()=>setSelectedId(p.id)}>
-                      <span title={p.name}>{p.name}</span>
-                      <button className="btn-danger-soft" title="Supprimer"
-                        onClick={e=>{e.stopPropagation();handleDeleteProject(p.id);}}>×</button>
+                    <li key={p.id} className={p.id===selectedId?'selected':''} onClick={()=>{if(renamingId!==p.id)setSelectedId(p.id);}}>
+                      {renamingId === p.id ? (
+                        <form onSubmit={handleRename} className="project-rename-form" onClick={e=>e.stopPropagation()}>
+                          <input type="text" autoFocus value={renameValue} onChange={e=>setRenameValue(e.target.value)} />
+                          <button type="submit" className="btn-rename-ok">OK</button>
+                          <button type="button" className="btn-rename-cancel" onClick={e=>{e.stopPropagation();setRenamingId(null);}}>×</button>
+                        </form>
+                      ) : (
+                        <React.Fragment>
+                          <span title={p.name}>{p.name}</span>
+                          <div className="project-actions" onClick={e=>e.stopPropagation()}>
+                            <button className="btn-edit" title="Renommer" onClick={e=>startRename(p,e)}>R</button>
+                            <button className="btn-danger-soft" title="Supprimer" onClick={e=>{e.stopPropagation();handleDeleteProject(p.id);}}>×</button>
+                          </div>
+                        </React.Fragment>
+                      )}
                     </li>
                   ))}
                   {projects.length===0 && <li className="empty">Aucun projet</li>}
@@ -458,10 +548,12 @@
                       <div className="section-header">
                         <span className="section-title">Entites ({entities.length})</span>
                         <div className="btn-group">
-                          <button className="btn-secondary" onClick={()=>{setNewEntity(demoEntity());setShowForm(true);}}>
-                            Demo rapide
-                          </button>
-                          <button className="btn-primary" onClick={()=>setShowForm(v=>!v)}>
+                          {!showForm && (
+                            <button className="btn-secondary" onClick={()=>{setNewEntity(demoEntity());setEditingEntityId(null);setShowForm(true);}}>
+                              Demo rapide
+                            </button>
+                          )}
+                          <button className="btn-primary" onClick={showForm ? handleCancelForm : ()=>{setNewEntity(emptyEntity());setEditingEntityId(null);setShowForm(true);}}>
                             {showForm ? 'Fermer' : '+ Ajouter'}
                           </button>
                         </div>
@@ -469,6 +561,9 @@
 
                       {showForm && (
                         <form onSubmit={handleCreateEntity} className="entity-form">
+                          <div style={{fontSize:'0.8rem',fontWeight:600,color:'#4a5568',marginBottom:'0.5rem'}}>
+                            {editingEntityId ? 'Modifier l\'entite' : 'Nouvelle entite'}
+                          </div>
                           <div className="form-row">
                             <div className="form-field" style={{flex:1}}>
                               <label>Nom de l'entite</label>
@@ -527,7 +622,10 @@
                               onClick={()=>setNewEntity(p=>({...p,attributes:[...p.attributes,emptyAttr()]}))}>
                               + Attribut
                             </button>
-                            <button type="submit" className="btn-primary">Enregistrer</button>
+                            <button type="submit" className="btn-primary">
+                              {editingEntityId ? 'Mettre a jour' : 'Enregistrer'}
+                            </button>
+                            <button type="button" className="btn-secondary" onClick={handleCancelForm}>Annuler</button>
                           </div>
                         </form>
                       )}
@@ -554,7 +652,10 @@
                                 </div>
                               </td>
                               <td>
-                                <button className="btn-danger-soft" onClick={()=>handleDeleteEntity(ent.id)}>×</button>
+                                <div className="btn-group">
+                                  <button className="btn-edit" title="Modifier" onClick={()=>handleEditEntity(ent)}>Modifier</button>
+                                  <button className="btn-danger-soft" title="Supprimer" onClick={()=>handleDeleteEntity(ent.id)}>×</button>
+                                </div>
                               </td>
                             </tr>
                           ))}
