@@ -2,7 +2,7 @@
 
 API REST Spring Boot pour la generation automatique de datasets configurables avec export multi-format.
 
-> **Note** : Ce README decrit l'architecture **monolithique** actuelle du service. Une refonte vers une architecture microservices est prévue.
+> **Note** : Ce README decrit l'API CRUD de ce service (projets/entites/attributs). Pour la vue d'ensemble de l'architecture microservices (Eureka, Gateway, Config Server, generator-service, Resilience4J), voir le [README principal](../README.md) a la racine du projet.
 
 ## Stack Technique
 
