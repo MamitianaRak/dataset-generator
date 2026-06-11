@@ -52,6 +52,18 @@ La configuration partagée (ports, routes de la gateway, paramètres Resilience4
 
 ## Lancer le projet
 
+### Option 1 : Avec Docker (recommandé) 🐳
+
+**Avantage :** Démarrage automatique de tous les services en une seule commande, aucune installation Java/Maven requise.
+
+```bash
+docker-compose up --build
+```
+
+Voir la section **Dockerisation** plus bas pour le guide complet.
+
+### Option 2 : Manuel (développement)
+
 **L'ordre de démarrage compte**, parce que la plupart des services vont chercher leur config (port, routes, paramètres Eureka/Resilience4J...) auprès du Config Server au démarrage. Si le Config Server n'est pas encore up, l'import est `optional:` donc ça ne plante pas, mais le service démarre alors avec une config minimale (port par défaut 8080 etc.).
 
 Ordre conseillé :
@@ -230,12 +242,88 @@ curl http://localhost:8083/generator/api/generator/1/preview
 
 Les tests fonctionnels (collection Bruno) couvrent le CRUD de `dataset_manager_service` (tests unitaires, tests d'erreur, scénario d'intégration). Voir `dataset_manager_service/tests/bruno-collection/README.md` pour les lancer.
 
+## Dockerisation
+
+### Prérequis
+
+- **Docker Desktop** installé et démarré (inclut Docker Compose)
+- Aucune autre installation requise (pas besoin de Java, Maven ou Node.js)
+
+```bash
+docker --version
+docker-compose --version
+```
+
+### Démarrage
+
+```bash
+# Build et démarrer tous les services (première fois ~5-10 min)
+docker-compose up --build
+
+# Mode détaché (arrière-plan)
+docker-compose up -d --build
+
+# Démarrer sans rebuild
+docker-compose up -d
+```
+
+Les services démarrent dans le bon ordre grâce aux healthchecks : Config → Eureka → Manager + Generator → Gateway → Frontend.
+
+### Vérifier que tout fonctionne
+
+```bash
+docker-compose ps
+```
+
+6 conteneurs doivent être en "Up" : `config-service` (8888), `discovery-server` (8761), `dataset-manager` (8081), `generator-service` (8082), `gateway` (8083), `frontend` (5173).
+
+Ouvrir ensuite :
+- Eureka dashboard : http://localhost:8761 → 4 services enregistrés
+- Frontend : http://localhost:5173
+- Swagger : http://localhost:8081/api/swagger-ui/index.html
+
+### Commandes utiles
+
+```bash
+# Logs
+docker-compose logs -f                      # tous les services
+docker-compose logs -f dataset-manager      # un service
+
+# Arrêt
+docker-compose down                         # arrêter
+docker-compose down -v                      # arrêter + supprimer la base H2
+docker-compose down -v --rmi all            # tout supprimer
+
+# Rebuild d'un seul service
+docker-compose up -d --build dataset-manager
+
+# Accéder à un conteneur
+docker exec -it dataset-manager sh
+```
+
+### Persistance des données
+
+La base H2 est stockée dans le volume Docker `dataset-manager-data`, géré automatiquement. Elle survit aux redémarrages (`docker-compose down`) mais est effacée avec `docker-compose down -v`.
+
+### Dépannage
+
+**Un service ne démarre pas** → `docker-compose logs -f <service>`
+
+**Port déjà utilisé** → `lsof -i :8081` pour identifier le process, ou changer le port dans `docker-compose.yml`
+
+**Build échoue** →
+```bash
+docker-compose down --rmi all
+docker-compose up --build
+```
+
+**Services absents dans Eureka** → Attendre 30-60 secondes après le démarrage, le temps que les services s'enregistrent.
+
 ## Limites connues / à finaliser
 
 - La règle de réécriture de la gateway pour `/DATASET-MANAGER/api/projects/**` est à revérifier vis-à-vis du `context-path=/api` de `dataset-manager` (les routes auto-découverte `/dataset-manager/**` et `/generator/**` fonctionnent en attendant).
 - Le champ `generator` (FakerGenerator/SequentialGenerator, locale, valeur de départ...) défini sur un attribut n'est pas encore propagé jusqu'au `generator-service` : la génération se base uniquement sur le nom et le type de l'attribut pour l'instant.
 - Les distributions statistiques (`distribution/` côté `dataset-manager`) ne sont pas encore exploitées par le `generator-service`.
-- Dockerisation de l'ensemble : pas encore faite (optionnel dans l'énoncé).
 
 ## Auteurs
 

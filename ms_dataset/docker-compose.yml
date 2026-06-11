@@ -1,0 +1,126 @@
+services:
+  # 1. Config Service - Doit démarrer en premier
+  config-service:
+    build:
+      context: ./config_service
+      dockerfile: Dockerfile
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-repo:/app/config-repo:ro
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/app/config-repo/
+      - SPRING_PROFILES_ACTIVE=native
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8888/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # 2. Discovery Server (Eureka) - Dépend du Config Service
+  discovery-server:
+    build:
+      context: ./discovery_server
+      dockerfile: Dockerfile
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+    networks:
+      - microservices-network
+    depends_on:
+      config-service:
+        condition: service_healthy
+    healthcheck:
+      # Eureka dashboard = signe que le serveur est prêt
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8761/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # 3. Dataset Manager Service - pas d'Actuator, on vérifie l'endpoint /api/projects
+  dataset-manager:
+    build:
+      context: ./dataset_manager_service
+      dockerfile: Dockerfile
+    container_name: dataset-manager
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    volumes:
+      - dataset-manager-data:/app/data
+    networks:
+      - microservices-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8081/api/projects || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  # 4. Generator Service - pas d'Actuator, on démarre dès qu'Eureka est prêt
+  generator-service:
+    build:
+      context: ./generator_service
+      dockerfile: Dockerfile
+    container_name: generator-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    networks:
+      - microservices-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+  # 5. Gateway - pas d'Actuator, on démarre dès qu'Eureka est prêt
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    networks:
+      - microservices-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+  # 6. Frontend - Interface de démo
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - microservices-network
+    depends_on:
+      - discovery-server
+
+# Network partagé entre tous les services
+networks:
+  microservices-network:
+    driver: bridge
+
+# Volume pour persister la base H2
+volumes:
+  dataset-manager-data:

@@ -115,6 +115,10 @@ buildNumber.properties
 ### Docker ###
 .dockerignore
 
+### Notes personnelles ###
+SOUTENANCE.md
+README-DOCKER.md
+
 ### Microservices specific ###
 # Config server local storage (si Git backend)
 config-repo-local/

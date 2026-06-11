@@ -31,6 +31,6 @@ const server = http.createServer((req, res) => {
   })
 })
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Frontend de demo disponible sur http://localhost:${PORT}`)
 })
