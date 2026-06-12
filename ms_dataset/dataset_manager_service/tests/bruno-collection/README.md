@@ -6,13 +6,18 @@ Collection de tests Bruno pour le microservice de generation de datasets.
 
 ### Environnement : MicroService
 
-| Variable             | Valeur                        | Description                       |
-|----------------------|-------------------------------|-----------------------------------|
-| `baseUrl`            | `http://localhost:8081/api`   | URL de base de l'API              |
-| `projectId`          | `1`                           | ID projet pour tests unitaires    |
-| `entityId`           | `1`                           | ID entite pour tests unitaires    |
-| `current_project_id` | (dynamique)                   | Defini par IntegrationTests       |
-| `current_entity_id`  | (dynamique)                   | Defini par IntegrationTests       |
+| Variable             | Valeur                        | Description                                        |
+|----------------------|-------------------------------|----------------------------------------------------|
+| `baseUrl`            | `http://localhost:8081/api`   | dataset-manager (CRUD projets/entites)             |
+| `generatorUrl`       | `http://localhost:8082/api`   | generator-service (preview + export)               |
+| `projectId`          | `1`                           | ID projet pour tests unitaires                     |
+| `entityId`           | `1`                           | ID entite pour tests unitaires                     |
+| `current_project_id` | (dynamique)                   | Defini par IntegrationTests                        |
+| `current_entity_id`  | (dynamique)                   | Defini par IntegrationTests                        |
+
+> **Architecture microservices** : les endpoints de generation (`/preview`, `/export`) ont ete
+> deplacer vers le `generator-service` (port 8082). Le `dataset-manager` (port 8081) ne gere
+> plus que le CRUD projets/entites.
 
 ## Structure des tests
 
@@ -32,9 +37,9 @@ Tests isoles sur chaque endpoint avec des donnees valides.
 | 8 | CreateEntity   | POST    | `/projects/{projectId}/entities`            |
 | 9 | UpdateEntity   | PUT     | `/entities/{entityId}`                      |
 | 10| DeleteEntity   | DELETE  | `/entities/{entityId}`                      |
-| 11| PreviewData    | GET     | `/projects/{projectId}/preview`             |
-| 12| ExportJSON     | GET     | `/projects/{projectId}/export?format=json`  |
-| 13| ExportXML      | GET     | `/projects/{projectId}/export?format=xml`   |
+| 11| PreviewData    | GET     | `{{generatorUrl}}/generator/{projectId}/preview`             |
+| 12| ExportJSON     | GET     | `{{generatorUrl}}/generator/{projectId}/export?format=json`  |
+| 13| ExportXML      | GET     | `{{generatorUrl}}/generator/{projectId}/export?format=xml`   |
 
 ### Dossier B - ErrorTests (7 tests)
 
@@ -90,7 +95,8 @@ Scenario complet "Happy Path" avec chainage de variables. Idempotent (rejouable 
 ## Execution CLI
 
 ### Prerequis
-- Backend Spring demarre sur `http://localhost:8081`
+- `dataset-manager` demarre sur `http://localhost:8081`
+- `generator-service` demarre sur `http://localhost:8082`
 - Bruno CLI installe : `npm install -g @usebruno/cli`
 
 ### Commandes
