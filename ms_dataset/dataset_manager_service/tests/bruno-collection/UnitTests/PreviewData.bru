@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/projects/{{projectId}}/preview
+  url: {{generatorUrl}}/generator/{{projectId}}/preview
   body: none
   auth: none
 }
@@ -21,6 +21,11 @@ tests {
 
   test("Response should contain project name", function() {
     expect(res.body).to.have.property('projectName');
+  });
+
+  test("Response status should be OK or PARTIAL", function() {
+    expect(res.body).to.have.property('status');
+    expect(['OK', 'PARTIAL']).to.include(res.body.status);
   });
 
   test("Response should contain data array", function() {
