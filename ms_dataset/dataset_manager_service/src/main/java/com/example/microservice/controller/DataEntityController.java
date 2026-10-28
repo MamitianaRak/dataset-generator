@@ -34,6 +34,17 @@ public class DataEntityController {
     }
 
     /**
+     * POST /api/entities/{parentId}/sub-entities - Ajouter une sous-entité (table liée) à une entité existante
+     */
+    @PostMapping("/entities/{parentId}/sub-entities")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DataEntityResponseDTO createSubEntity(
+            @PathVariable("parentId") Long parentId,
+            @Valid @RequestBody DataEntityCreateDTO dto) {
+        return dataEntityService.createSubEntity(parentId, dto);
+    }
+
+    /**
      * GET /api/projects/{projectId}/entities - Lister toutes les entités dans un projet
      */
     @GetMapping("/projects/{projectId}/entities")

@@ -112,9 +112,6 @@ buildNumber.properties
 # GARDER : maven-wrapper.properties (définit la version Maven)
 # GARDER : mvnw et mvnw.cmd (scripts d'exécution)
 
-### Docker ###
-.dockerignore
-
 ### Notes personnelles ###
 SOUTENANCE.md
 README-DOCKER.md

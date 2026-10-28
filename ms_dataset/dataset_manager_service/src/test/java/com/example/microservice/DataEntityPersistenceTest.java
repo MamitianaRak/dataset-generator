@@ -98,6 +98,23 @@ class DataEntityPersistenceTest {
     }
 
     @Test
+    void aSubEntityCanBeAddedToAnExistingEntity() {
+        Long projectId = project("add-child");
+        DataEntityResponseDTO customer = entities.createEntity(projectId,
+                entity("customer", List.of(attribute("name", new StringTypeDTO()))));
+
+        DataEntityResponseDTO order = entities.createSubEntity(customer.getId(),
+                entity("order", List.of(attribute("total", new IntegerTypeDTO()))));
+
+        assertThat(order.getProjectId()).isEqualTo(projectId);
+        assertThat(entities.findEntitiesByProject(projectId)).singleElement()
+                .satisfies(root -> assertThat(root.getSubEntities()).extracting(DataEntityResponseDTO::getName)
+                        .containsExactly("order"));
+        assertThatThrownBy(() -> entities.createSubEntity(customer.getId(), entity("customer", List.of())))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
     void duplicateAttributeNamesAreRejected() {
         Long projectId = project("duplicates");
         DataEntityCreateDTO entity = entity("t", List.of(

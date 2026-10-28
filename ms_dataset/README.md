@@ -130,7 +130,8 @@ Context-path : `/api`. Endpoints principaux :
 | GET | `/api/projects/{projectId}/entities` | Lister les entités d'un projet |
 | GET | `/api/entities/{id}` | Détail d'une entité |
 | PUT | `/api/entities/{id}` | Modifier une entité |
-| DELETE | `/api/entities/{id}` | Supprimer une entité |
+| DELETE | `/api/entities/{id}` | Supprimer une entité (et ses sous-entités) |
+| POST | `/api/entities/{id}/sub-entities` | Ajouter une sous-entité à une entité existante |
 
 Swagger UI : http://localhost:8081/api/swagger-ui/index.html
 
@@ -168,7 +169,7 @@ Le nouveau service "ouvrier". **Stateless** (pas de base de données, pas d'éta
 | GET | `/api/generator/{projectId}/preview` | Aperçu JSON : 100 lignes par table au plus (`app.preview.rows-per-table`) |
 | GET | `/api/generator/{projectId}/export?format=json\|xml\|csv\|sql` | Export complet, envoyé en streaming |
 
-Pour générer les données, ce service ne connaît rien du modèle : il va chercher la définition du projet (entités, attributs, types, contraintes) auprès de `dataset-manager` via Feign, puis génère les valeurs avec Datafaker. Le générateur détecte automatiquement le domaine d'un attribut à partir de son nom (`email`, `firstName`, `city`, `price`...) et, à défaut, se base sur son type (`IntegerType`, `DateType`, `EnumType`...).
+Pour générer les données, ce service ne connaît rien du modèle : il va chercher la définition du projet (entités, attributs, types, contraintes) auprès de `dataset-manager` via Feign, puis génère les valeurs avec Datafaker. Le générateur détecte automatiquement le domaine d'un attribut à partir de son nom (`email`, `firstName`, `city`, `price`...) et, à défaut, se base sur son type (`IntegerType`, `DateType`, `EnumType`...). Les contraintes explicites passent avant le nom : un attribut `age` borné entre 18 et 90 reste dans ces bornes, et une liste de valeurs autorisées (`EnumConstraint`) limite les valeurs générées. Auparavant, la stratégie par nom l'emportait et produisait des âges hors bornes.
 
 #### Données relationnelles
 
@@ -369,7 +370,8 @@ docker-compose up --build
 
 ## Limites connues / à finaliser
 
-- La réécriture des routes manuelles de la gateway (`/DATASET-MANAGER/...`, `/GENERATOR-SERVICE/...`) a été corrigée : elle retire seulement le préfixe. L'ancienne règle perdait le segment `projects`. Elle reste à valider en lançant la gateway.
+- Gateway : aucune route n'était chargée, ni les routes manuelles ni la découverte automatique. Spring Cloud 2025 (`spring-cloud-starter-gateway-server-webflux`) lit ses réglages sous `spring.cloud.gateway.server.webflux.*` et ignorait sans prévenir les anciennes clés `spring.cloud.gateway.*`. La réécriture des routes manuelles perdait aussi le segment `projects`. Les deux sont corrigés et vérifiés sur la stack lancée : `/DATASET-MANAGER/api/projects/**`, `/GENERATOR-SERVICE/api/generator/**` et les routes automatiques répondent.
+- Jackson 3 (Spring Boot 4) refusait un corps sans le champ facultatif `quantity` d'un attribut (« Cannot map `null` into type `int` »), ce que le front n'envoie pas. `spring.jackson.deserialization.fail-on-null-for-primitives=false` rétablit le comportement de Jackson 2 ; `EntityJsonApiTest` couvre l'API en JSON réel.
 - Le champ `generator` (FakerGenerator/SequentialGenerator, locale, valeur de départ...) est accepté par l'API mais n'est ni enregistré ni utilisé : la génération se base sur le nom et le type de l'attribut.
 - Les distributions statistiques (loi normale, probabilités par valeur d'une énumération) ne sont pas gérées.
 

@@ -1,5 +1,11 @@
 spring:
   application:
     name: gateway
+  # The config server is required: started before it, the gateway used to come up without its routes and port.
+  # It now stops with a clear error: start the config server first.
+  # Docker Compose overrides the import with SPRING_CONFIG_IMPORT.
   config:
     import: optional:configserver:http://localhost:8888
+  cloud:
+    config:
+      fail-fast: true

@@ -40,6 +40,17 @@ class DataEntityServiceImpl implements DataEntityService {
         return dataEntityMapper.toTrees(created, entity -> entity == root).getFirst();
     }
 
+    /** The sub-entity joins its parent's project, so names stay unique per project. */
+    @Override
+    public DataEntityResponseDTO createSubEntity(Long parentId, DataEntityCreateDTO dto) {
+        DataEntity parent = load(parentId);
+        List<DataEntity> created = new ArrayList<>();
+        DataEntity child = create(parent.getProject(), parent, dto, created);
+        dataEntityRepository.saveAll(created);
+        dataEntityRepository.flush();
+        return dataEntityMapper.toTrees(created, entity -> entity == child).getFirst();
+    }
+
     private DataEntity create(Project project, DataEntity parent, DataEntityCreateDTO dto, List<DataEntity> created) {
         DataEntity entity = new DataEntity(project, parent, dto.getName(), dto.getQuantity());
         entity.defineAttributes(dataEntityMapper.toSpecs(dto.getAttributes()));

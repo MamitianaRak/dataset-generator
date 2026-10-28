@@ -16,6 +16,11 @@ public interface DataEntityService {
     DataEntityResponseDTO createEntity(Long projectId, DataEntityCreateDTO dto);
 
     /**
+     * Ajoute une sous-entité à une entité existante (dans le même projet).
+     */
+    DataEntityResponseDTO createSubEntity(Long parentId, DataEntityCreateDTO dto);
+
+    /**
      * Liste toutes les entités d'un projet.
      */
     List<DataEntityResponseDTO> findEntitiesByProject(Long projectId);
