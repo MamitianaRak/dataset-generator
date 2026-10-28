@@ -33,7 +33,7 @@ client →│  Gateway   │→ │  dataset-  │  │  generator-service  │
 | `discovery_server` | Annuaire Eureka | 8761 | — |
 | `config_service` | Config Server (mode `native`, lit `config-repo/`) | 8888 | — |
 | `gateway` | Point d'entrée unique (Spring Cloud Gateway) | 8083 | — |
-| `dataset_manager_service` | Gestion des projets / entités / attributs (CRUD) | 8081 | H2 fichier |
+| `dataset_manager_service` | Gestion des projets / entités / attributs (CRUD) | 8081 | PostgreSQL (Flyway) |
 | `generator_service` | Génération + export des données (worker stateless) | 8082 | aucune |
 
 La configuration partagée (ports, routes de la gateway, paramètres Resilience4J, URL Eureka...) est centralisée dans `config-repo/`. Chaque service va la chercher au démarrage auprès du `config_service`.
@@ -46,7 +46,8 @@ La configuration partagée (ports, routes de la gateway, paramètres Resilience4
 - Spring Cloud Config Server (profil `native`)
 - OpenFeign pour les appels inter-services
 - Resilience4J (Circuit Breaker + TimeLimiter)
-- Spring Data JPA + H2 (uniquement côté `dataset_manager_service`)
+- Spring Data JPA / Hibernate 7, PostgreSQL 17, Flyway (uniquement côté `dataset_manager_service`)
+- Tests : JUnit 5, Testcontainers (PostgreSQL réel)
 - Datafaker pour la génération de données réalistes
 - Lombok, MapStruct, Springdoc OpenAPI
 
@@ -114,7 +115,7 @@ Point d'entrée unique sur le port **8083**. Deux types de routes sont actives :
 
 ### 4. `dataset_manager_service`
 
-C'est l'ancien monolithe, allégé de toute la logique de génération. Il garde le CRUD complet sur les projets et leurs entités/attributs, persistés en H2 (fichier dans `dataset_manager_service/data/devDb`).
+C'est l'ancien monolithe, allégé de toute la logique de génération. Il garde le CRUD complet sur les projets et leurs entités/attributs, persistés dans PostgreSQL (voir « Couche de persistance » plus bas).
 
 Context-path : `/api`. Endpoints principaux :
 
@@ -132,9 +133,31 @@ Context-path : `/api`. Endpoints principaux :
 | DELETE | `/api/entities/{id}` | Supprimer une entité |
 
 Swagger UI : http://localhost:8081/api/swagger-ui/index.html
-Console H2 : http://localhost:8081/api/h2-console
 
 Pour le détail des types/contraintes supportés et des exemples de payload complets (entités avec sous-entités, etc.), voir `dataset_manager_service/readme.md`.
+
+#### Couche de persistance
+
+La couche JPA a été reprise après mesure : le service générateur charge un projet complet avant chaque aperçu et chaque export, et ce chargement déclenchait une requête par entité, par attribut et par type (problème N+1).
+
+| Projet de test : 5 entités × 6 attributs, plus 5 sous-entités × 3 | Avant | Après |
+|---|---|---|
+| Requêtes SQL pour charger le projet | 87 | 2 |
+| Requêtes SQL pour le créer | 210 | 29 |
+
+Mesuré avec les statistiques Hibernate (`ProjectLoadingQueryCountTest`), avant sur H2, après sur PostgreSQL ; le nombre de requêtes ne dépend pas de la base. Le test échoue si le chargement repasse au-dessus de 2 requêtes.
+
+Ce qui a changé :
+
+- **Type et contraintes d'un attribut en `jsonb`.** Ce sont des valeurs propres à un attribut, sans identité partagée : elles étaient des entités dans trois tables (avec héritage, `@ManyToMany` et `CascadeType.ALL`), chargées en `EAGER` attribut par attribut. Elles sont maintenant une colonne lue avec la ligne.
+- **Un projet en une requête.** Les sous-entités portent aussi leur `project_id` ; le projet est chargé par un `join fetch` sur les attributs, puis l'arbre est reconstruit en mémoire à partir des `parent_id`. Les noms d'entités sont uniques par projet, sous-entités comprises (ils deviennent des noms de tables à l'export SQL).
+- **Insertions groupées.** Les identifiants viennent de séquences allouées par blocs de 50 au lieu de colonnes `IDENTITY`, ce qui permet à Hibernate d'envoyer les `INSERT` en lots JDBC.
+- **Mise à jour sans tout recréer.** Les attributs sont rapprochés par nom : un attribut conservé garde son identifiant, au lieu d'être supprimé puis réinséré (contournement qui imposait un `flush` intermédiaire, Hibernate exécutant les insertions avant les suppressions).
+- **Schéma versionné.** Flyway crée le schéma (`db/migration`), Hibernate le valide (`ddl-auto=validate`) au lieu de le modifier (`update`). Les suppressions en cascade sont faites par la base (`on delete cascade`).
+- **Entités correctes.** Verrou optimiste (`@Version`, conflit renvoyé en 409), `equals`/`hashCode` sur l'identifiant sans casser les collections avant persistance, plus de `@Builder` Lombok qui contournait la synchronisation des relations, `open-in-view` désactivé.
+- **Code mort retiré** : distributions, sources de données et logique de génération restées dans les entités alors que la génération est faite par `generator_service`.
+
+Les tests (`mvn test`) tournent sur un PostgreSQL lancé par Testcontainers : il faut Docker.
 
 ### 5. `generator_service`
 
@@ -291,7 +314,7 @@ docker-compose logs -f dataset-manager      # un service
 
 # Arrêt
 docker-compose down                         # arrêter
-docker-compose down -v                      # arrêter + supprimer la base H2
+docker-compose down -v                      # arrêter + supprimer la base PostgreSQL
 docker-compose down -v --rmi all            # tout supprimer
 
 # Rebuild d'un seul service
@@ -303,7 +326,7 @@ docker exec -it dataset-manager sh
 
 ### Persistance des données
 
-La base H2 est stockée dans le volume Docker `dataset-manager-data`, géré automatiquement. Elle survit aux redémarrages (`docker-compose down`) mais est effacée avec `docker-compose down -v`.
+La base PostgreSQL (service `dataset-db`) est stockée dans le volume Docker `dataset-db-data`. Elle survit aux redémarrages (`docker-compose down`) mais est effacée avec `docker-compose down -v`. Le schéma est créé par Flyway au premier démarrage de `dataset-manager`.
 
 ### Dépannage
 

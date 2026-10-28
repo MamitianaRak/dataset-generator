@@ -7,57 +7,59 @@ import com.example.microservice.mapper.ProjectMapper;
 import com.example.microservice.model.entities.Project;
 import com.example.microservice.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService {
+
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
 
-    @Autowired
     public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
     }
 
-    public List<ProjectResponseDTO> findAll(){
+    @Override
+    public List<ProjectResponseDTO> findAll() {
         return projectMapper.projectListToProjectResponseDTOList(projectRepository.findAll());
     }
 
-    public ProjectResponseDTO findById(Long id){
-        Project project = this.projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
+    @Override
+    public ProjectResponseDTO findById(Long id) {
+        return projectMapper.projectToProjectResponseDTO(load(id));
+    }
+
+    @Override
+    @Transactional
+    public ProjectResponseDTO save(ProjectCreateDTO projectCreateDTO) {
+        Project project = projectRepository.saveAndFlush(new Project(projectCreateDTO.getName()));
         return projectMapper.projectToProjectResponseDTO(project);
     }
 
+    @Override
     @Transactional
-    public ProjectResponseDTO save(ProjectCreateDTO projectCreateDTO){
-        Project project = projectMapper.projectCreateDTOToProject(projectCreateDTO);
-        project = this.projectRepository.save(project);
-        return projectMapper.projectToProjectResponseDTO(project);
-    }
-
-    @Transactional
-    public ProjectResponseDTO update(Long id, ProjectUpdateDTO projectUpdateDTO){
-        Project existingProject = this.projectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
-
-        projectMapper.updateProjectFromDTO(projectUpdateDTO, existingProject);
-
-        Project updatedProject = this.projectRepository.save(existingProject);
-        return projectMapper.projectToProjectResponseDTO(updatedProject);
-    }
-
-    @Transactional
-    public void delete(Long id){
-        if (!this.projectRepository.existsById(id)) {
-            throw new EntityNotFoundException("Project not found with id: " + id);
+    public ProjectResponseDTO update(Long id, ProjectUpdateDTO projectUpdateDTO) {
+        Project project = load(id);
+        if (projectUpdateDTO.getName() != null) {
+            project.rename(projectUpdateDTO.getName());
         }
-        this.projectRepository.deleteById(id);
+        // Flushed here so the new timestamps and a duplicate name show up in this response, not after it.
+        return projectMapper.projectToProjectResponseDTO(projectRepository.saveAndFlush(project));
+    }
+
+    /** The database removes the project's entities and attributes ({@code on delete cascade}). */
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        projectRepository.delete(load(id));
+    }
+
+    private Project load(Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + id));
     }
 }

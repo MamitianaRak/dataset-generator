@@ -7,7 +7,7 @@ API REST Spring Boot pour la generation automatique de datasets configurables av
 ## Stack Technique
 
 - **Java 25** / **Spring Boot 4.0.1**
-- **Spring Data JPA** + **H2** (base persistante fichier)
+- **Spring Data JPA** / Hibernate 7 + **PostgreSQL**, schéma versionné par **Flyway**
 - **Lombok** / **Springdoc OpenAPI** (Swagger)
 - **Datafaker** pour la generation de donnees realistes
 - **Maven** (wrapper inclus)
