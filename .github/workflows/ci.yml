@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  services:
+    name: ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [config_service, discovery_server, dataset_manager_service, generator_service, gateway]
+    defaults:
+      run:
+        working-directory: ms_dataset/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: ms_dataset/${{ matrix.service }}/pom.xml
+      # Maven of the runner image: dataset_manager_service ships mvnw without its .mvn/wrapper.
+      # Docker is available on the runner, so the Testcontainers test (SQL export loaded into PostgreSQL) runs too.
+      - name: Test and package
+        run: mvn -B -ntp verify
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ms_dataset/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ms_dataset/frontend/package-lock.json
+      - run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Type-check and build
+        run: npm run build
