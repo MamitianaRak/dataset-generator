@@ -219,6 +219,8 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         String message = "Invalid JSON format or unknown type";
+        // The client gets a short message; the log keeps the parser's, without which a rejected body cannot be diagnosed.
+        logger.warn("Unreadable request body on {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
 
         if (ex.getCause() != null && ex.getCause().getMessage() != null) {
             String causeMessage = ex.getCause().getMessage();

@@ -1,16 +1,15 @@
-# Image légère avec Node.js
-FROM node:20-alpine
-
+# 1. Build: type-check, then Vite production bundle
+FROM node:22-alpine AS build
 WORKDIR /app
-
-# Copier les fichiers du frontend
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 COPY . .
+RUN npm run build
 
-# Installer les dépendances si nécessaire (mais normalement pas besoin, vendor/ existe déjà)
-# RUN npm install
-
-# Exposer le port
+# 2. Runtime: only the built files and a dependency-free static server
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY server.cjs ./
 EXPOSE 5173
-
-# Démarrer le serveur
-CMD ["node", "server.js"]
+CMD ["node", "server.cjs"]

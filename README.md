@@ -27,8 +27,9 @@ flowchart LR
 ## Stack technique
 
 - **Backend** : Java 25, Spring Boot 4, Spring Data JPA / Hibernate 7, H2, Flyway, Datafaker
+- **Frontend** : React 19, TypeScript, Vite
 - **Microservices** : Spring Cloud Gateway, Eureka, Config Server, OpenFeign, Resilience4J
-- **Tests** : JUnit 5, AssertJ, Testcontainers, collection d'API Bruno
+- **Tests** : JUnit 5, AssertJ, Testcontainers, Vitest, collection d'API Bruno
 - **Déploiement** : Docker, Docker Compose
 
 ## Points techniques
@@ -52,7 +53,7 @@ Le type et les contraintes d'une colonne sont stockés en JSON au lieu de trois 
 
 Prérequis : Java 25 et Maven. Pas besoin de Docker : la base est un fichier H2.
 
-Démarrer les services dans cet ordre, chacun dans son propre terminal, avec `mvn spring-boot:run` lancé dans son dossier sous `ms_dataset/` :
+Démarrer les services dans cet ordre, chacun dans son propre terminal, avec `mvn spring-boot:run` lancé dans son dossier sous `ms_dataset/`. Le serveur de configuration doit répondre avant les autres : un service lancé sans lui s'arrête avec un message explicite au lieu de démarrer mal configuré.
 
 1. `config_service`
 2. `discovery_server`
@@ -60,7 +61,7 @@ Démarrer les services dans cet ordre, chacun dans son propre terminal, avec `mv
 4. `generator_service`
 5. `gateway`
 
-Puis le front de démonstration, depuis `ms_dataset/frontend/` : `node server.js`, et ouvrir http://localhost:5173.
+Puis l'interface, depuis `ms_dataset/frontend/` : `npm install`, puis `npm run dev`, et ouvrir http://localhost:5173.
 
 Avec Docker, tout se lance en une commande depuis `ms_dataset/` : `docker-compose up -d --build`.
 
@@ -72,7 +73,7 @@ Dans `ms_dataset/dataset_manager_service` puis `ms_dataset/generator_service` :
 mvn test
 ```
 
-dataset-manager compte 8 tests (H2 en mémoire), le générateur 16, dont un qui demande Docker pour lancer PostgreSQL.
+dataset-manager compte 12 tests (H2 en mémoire, dont des appels HTTP en JSON), le générateur 19, dont un qui demande Docker pour lancer PostgreSQL. Le front a ses tests Vitest : `npm test` dans `ms_dataset/frontend`.
 
 La collection d'API Bruno (cas passants, erreurs, scénario complet) est dans [`ms_dataset/dataset_manager_service/tests/bruno-collection`](ms_dataset/dataset_manager_service/tests/bruno-collection).
 

@@ -2,6 +2,7 @@ package com.example.generator_service.generation;
 
 import com.example.generator_service.dto.entity.AttributeDTO;
 import com.example.generator_service.dto.model.constraints.ConstraintDTO;
+import com.example.generator_service.dto.model.constraints.EnumConstraintDTO;
 import com.example.generator_service.dto.model.constraints.MinMaxConstraintDTO;
 import com.example.generator_service.generation.interfaces.IDataGenerator;
 import com.example.generator_service.generation.strategy.*;
@@ -83,14 +84,39 @@ public class FakerDataGenerator implements IDataGenerator {
         Faker f = getFaker();
         String name = normalize(attribute.getName());
 
-        // ── 1. Délégation aux stratégies par nom ──
+        // ── 1. Contraintes explicites : elles priment sur ce que le nom laisse deviner ──
+        // (sinon un attribut "age" borné 18-90 recevait l'âge de la stratégie par nom, hors bornes)
+        List<String> allowed = allowedValues(attribute);
+        if (!allowed.isEmpty()) {
+            return allowed.get(f.random().nextInt(allowed.size()));
+        }
+        if (hasRange(attribute)) {
+            return generateByTypeFromDTO(f, attribute);
+        }
+
+        // ── 2. Délégation aux stratégies par nom ──
         for (FakerNameStrategy strategy : getStrategies()) {
             Object value = strategy.generate(f, name);
             if (value != null) return value;
         }
 
-        // ── 2. Fallback : génération par type + contraintes ──
+        // ── 3. Fallback : génération par type ──
         return generateByTypeFromDTO(f, attribute);
+    }
+
+    private static List<String> allowedValues(AttributeDTO attribute) {
+        if (attribute.getConstraints() == null) return List.of();
+        return attribute.getConstraints().stream()
+                .filter(EnumConstraintDTO.class::isInstance)
+                .map(c -> ((EnumConstraintDTO) c).getAllowed())
+                .filter(values -> values != null && !values.isEmpty())
+                .findFirst()
+                .orElse(List.of());
+    }
+
+    private static boolean hasRange(AttributeDTO attribute) {
+        return attribute.getConstraints() != null
+                && attribute.getConstraints().stream().anyMatch(MinMaxConstraintDTO.class::isInstance);
     }
 
     private Object generateByTypeFromDTO(Faker f, AttributeDTO attribute) {
@@ -117,7 +143,8 @@ public class FakerDataGenerator implements IDataGenerator {
             case "IntegerType":
                 int minInt = (min != null) ? min.intValue() : 0;
                 int maxInt = (max != null) ? max.intValue() : 10000;
-                return f.number().numberBetween(minInt, maxInt);
+                // numberBetween excludes its upper bound: + 1 so that max itself can be generated.
+                return f.number().numberBetween(minInt, maxInt + 1);
 
             case "FloatType":
                 double minDouble = (min != null) ? min : 0.0;
