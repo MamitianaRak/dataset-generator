@@ -1,65 +1,72 @@
 package com.example.generator_service.export;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import com.example.generator_service.dataset.Record;
+import com.example.generator_service.dataset.TableSchema;
+import com.example.generator_service.export.interfaces.IDataExporter;
+import java.io.Writer;
+import java.util.Date;
 import java.util.Map;
 
-import com.example.generator_service.dataset.Dataset;
-import com.example.generator_service.dataset.Record;
-
-/**
- * Export JSON minimal. Utilise Dataset.
- */
-public class JSONExporter implements com.example.generator_service.export.interfaces.IDataExporter {
+/** {@code {"table": [{...}, ...], ...}}, written row by row. */
+public class JSONExporter implements IDataExporter {
 
     @Override
-    public void export(Dataset dataset, String outputPath) throws IOException {
-        if (dataset == null) throw new IllegalArgumentException("Dataset ne peut pas être null");
+    public TableWriter open(Writer out) {
+        return new StreamingWriter(out) {
+            private boolean firstRow;
 
-        try (FileWriter fw = new FileWriter(outputPath)) {
-            fw.write(toJson(dataset.getAllRecords()));
-        }
+            @Override
+            protected void startTable(TableSchema schema, TableSchema previous) {
+                write(previous == null ? "{" : "],");
+                write(string(schema.name()) + ":[");
+                firstRow = true;
+            }
+
+            @Override
+            public void row(Record record) {
+                StringBuilder json = new StringBuilder(firstRow ? "{" : ",{");
+                boolean firstField = true;
+                for (Map.Entry<String, Object> field : record.getValues().entrySet()) {
+                    json.append(firstField ? "" : ",").append(string(field.getKey())).append(':').append(value(field.getValue()));
+                    firstField = false;
+                }
+                write(json.append('}').toString());
+                firstRow = false;
+            }
+
+            @Override
+            public void finish() {
+                write(current == null ? "{}" : "]}");
+                super.finish();
+            }
+        };
     }
 
-    private String toJson(Object obj) {
-        if (obj == null) return "null";
-        if (obj instanceof String) return '"' + escape((String) obj) + '"';
-        if (obj instanceof Number || obj instanceof Boolean) return obj.toString();
-        if (obj instanceof Record) {
-            Record record = (Record) obj;
-            return toJson(record.getValues());
-        }
-        if (obj instanceof Map) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("{");
-            boolean first = true;
-            @SuppressWarnings("unchecked")
-            Map<Object, Object> m = (Map<Object, Object>) obj;
-            for (Map.Entry<Object, Object> e : m.entrySet()) {
-                if (!first) sb.append(",");
-                first = false;
-                sb.append(toJson(String.valueOf(e.getKey()))).append(":").append(toJson(e.getValue()));
-            }
-            sb.append("}");
-            return sb.toString();
-        }
-        if (obj instanceof Iterable) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[");
-            boolean first = true;
-            for (Object o : (Iterable<?>) obj) {
-                if (!first) sb.append(",");
-                first = false;
-                sb.append(toJson(o));
-            }
-            sb.append("]");
-            return sb.toString();
-        }
-        return '"' + escape(obj.toString()) + '"';
+    private static String value(Object value) {
+        if (value == null) return "null";
+        if (value instanceof Number || value instanceof Boolean) return value.toString();
+        if (value instanceof Date date) return string(date.toInstant().toString());
+        return string(value.toString());
     }
 
-    private String escape(String s) {
-        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+    private static String string(String s) {
+        StringBuilder json = new StringBuilder("\"");
+        for (char c : s.toCharArray()) {
+            switch (c) {
+                case '"' -> json.append("\\\"");
+                case '\\' -> json.append("\\\\");
+                case '\n' -> json.append("\\n");
+                case '\r' -> json.append("\\r");
+                case '\t' -> json.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        json.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        json.append(c);
+                    }
+                }
+            }
+        }
+        return json.append('"').toString();
     }
 }

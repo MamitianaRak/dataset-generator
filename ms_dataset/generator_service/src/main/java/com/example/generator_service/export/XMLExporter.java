@@ -1,43 +1,46 @@
 package com.example.generator_service.export;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import com.example.generator_service.dataset.Record;
+import com.example.generator_service.dataset.TableSchema;
+import com.example.generator_service.export.interfaces.IDataExporter;
+import java.io.Writer;
 import java.util.Map;
 
-import com.example.generator_service.dataset.Dataset;
-import com.example.generator_service.dataset.Record;
-
-/**
- * Export XML basique. Utilise Dataset et Record.
- */
-public class XMLExporter implements com.example.generator_service.export.interfaces.IDataExporter {
+/** {@code <dataset><entity name="..."><record>...</record></entity></dataset>}, written row by row. */
+public class XMLExporter implements IDataExporter {
 
     @Override
-    public void export(Dataset dataset, String outputPath) throws IOException {
-        if (dataset == null) throw new IllegalArgumentException("Dataset ne peut pas être null");
-
-        try (FileWriter fw = new FileWriter(outputPath)) {
-            fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-            fw.write("<dataset>\n");
-            for (Map.Entry<String, List<Record>> entry : dataset.getAllRecords().entrySet()) {
-                String entityName = entry.getKey();
-                List<Record> records = entry.getValue();
-                fw.write("  <entity name=\"" + escape(entityName) + "\">\n");
-                for (Record r : records) {
-                    fw.write("    <record>\n");
-                    for (Map.Entry<String, Object> col : r.getValues().entrySet()) {
-                        fw.write("      <" + escape(col.getKey()) + ">" + escape(String.valueOf(col.getValue())) + "</" + escape(col.getKey()) + ">\n");
-                    }
-                    fw.write("    </record>\n");
-                }
-                fw.write("  </entity>\n");
+    public TableWriter open(Writer out) {
+        return new StreamingWriter(out) {
+            {
+                write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<dataset>\n");
             }
-            fw.write("</dataset>\n");
-        }
+
+            @Override
+            protected void startTable(TableSchema schema, TableSchema previous) {
+                write((previous == null ? "" : "  </entity>\n") + "  <entity name=\"" + escape(schema.name()) + "\">\n");
+            }
+
+            @Override
+            public void row(Record record) {
+                StringBuilder xml = new StringBuilder("    <record>\n");
+                for (Map.Entry<String, Object> field : record.getValues().entrySet()) {
+                    String tag = escape(field.getKey());
+                    xml.append("      <").append(tag).append('>').append(escape(String.valueOf(field.getValue())))
+                            .append("</").append(tag).append(">\n");
+                }
+                write(xml.append("    </record>\n").toString());
+            }
+
+            @Override
+            public void finish() {
+                write((current == null ? "" : "  </entity>\n") + "</dataset>\n");
+                super.finish();
+            }
+        };
     }
 
-    private String escape(String s) {
+    private static String escape(String s) {
         if (s == null) return "";
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;");
     }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient(name = "dataset-manager", fallback = DatasetManagerClientFallback.class)
+@FeignClient(name = "dataset-manager", fallbackFactory = DatasetManagerClientFallback.class)
 public interface DatasetManagerClient {
 
     @GetMapping("/api/projects/{projectId}")
