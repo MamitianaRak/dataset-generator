@@ -89,6 +89,3 @@ application-dev.properties
 *.pem
 *.crt
 *.jks
-
-### Tests ###
-src/test/

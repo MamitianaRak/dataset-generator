@@ -33,7 +33,7 @@ client →│  Gateway   │→ │  dataset-  │  │  generator-service  │
 | `discovery_server` | Annuaire Eureka | 8761 | — |
 | `config_service` | Config Server (mode `native`, lit `config-repo/`) | 8888 | — |
 | `gateway` | Point d'entrée unique (Spring Cloud Gateway) | 8083 | — |
-| `dataset_manager_service` | Gestion des projets / entités / attributs (CRUD) | 8081 | PostgreSQL (Flyway) |
+| `dataset_manager_service` | Gestion des projets / entités / attributs (CRUD) | 8081 | H2 fichier (schéma Flyway) |
 | `generator_service` | Génération + export des données (worker stateless) | 8082 | aucune |
 
 La configuration partagée (ports, routes de la gateway, paramètres Resilience4J, URL Eureka...) est centralisée dans `config-repo/`. Chaque service va la chercher au démarrage auprès du `config_service`.
@@ -46,8 +46,8 @@ La configuration partagée (ports, routes de la gateway, paramètres Resilience4
 - Spring Cloud Config Server (profil `native`)
 - OpenFeign pour les appels inter-services
 - Resilience4J (Circuit Breaker + TimeLimiter)
-- Spring Data JPA / Hibernate 7, PostgreSQL 17, Flyway (uniquement côté `dataset_manager_service`)
-- Tests : JUnit 5, Testcontainers (PostgreSQL réel)
+- Spring Data JPA / Hibernate 7, H2, Flyway (uniquement côté `dataset_manager_service`)
+- Tests : JUnit 5 ; Testcontainers (PostgreSQL) pour vérifier que l'export SQL se charge dans une vraie base
 - Datafaker pour la génération de données réalistes
 - Lombok, MapStruct, Springdoc OpenAPI
 
@@ -115,7 +115,7 @@ Point d'entrée unique sur le port **8083**. Deux types de routes sont actives :
 
 ### 4. `dataset_manager_service`
 
-C'est l'ancien monolithe, allégé de toute la logique de génération. Il garde le CRUD complet sur les projets et leurs entités/attributs, persistés dans PostgreSQL (voir « Couche de persistance » plus bas).
+C'est l'ancien monolithe, allégé de toute la logique de génération. Il garde le CRUD complet sur les projets et leurs entités/attributs, persistés en H2 (fichier `data/dataset-manager`, voir « Couche de persistance » plus bas).
 
 Context-path : `/api`. Endpoints principaux :
 
@@ -145,11 +145,11 @@ La couche JPA a été reprise après mesure : le service générateur charge un 
 | Requêtes SQL pour charger le projet | 87 | 2 |
 | Requêtes SQL pour le créer | 210 | 29 |
 
-Mesuré avec les statistiques Hibernate (`ProjectLoadingQueryCountTest`), avant sur H2, après sur PostgreSQL ; le nombre de requêtes ne dépend pas de la base. Le test échoue si le chargement repasse au-dessus de 2 requêtes.
+Mesuré avec les statistiques Hibernate (`ProjectLoadingQueryCountTest`, sur H2). Le test échoue si le chargement repasse au-dessus de 2 requêtes.
 
 Ce qui a changé :
 
-- **Type et contraintes d'un attribut en `jsonb`.** Ce sont des valeurs propres à un attribut, sans identité partagée : elles étaient des entités dans trois tables (avec héritage, `@ManyToMany` et `CascadeType.ALL`), chargées en `EAGER` attribut par attribut. Elles sont maintenant une colonne lue avec la ligne.
+- **Type et contraintes d'un attribut dans une colonne JSON.** Ce sont des valeurs propres à un attribut, sans identité partagée : elles étaient des entités dans trois tables (avec héritage, `@ManyToMany` et `CascadeType.ALL`), chargées en `EAGER` attribut par attribut. Elles sont maintenant une colonne lue avec la ligne.
 - **Un projet en une requête.** Les sous-entités portent aussi leur `project_id` ; le projet est chargé par un `join fetch` sur les attributs, puis l'arbre est reconstruit en mémoire à partir des `parent_id`. Les noms d'entités sont uniques par projet, sous-entités comprises (ils deviennent des noms de tables à l'export SQL).
 - **Insertions groupées.** Les identifiants viennent de séquences allouées par blocs de 50 au lieu de colonnes `IDENTITY`, ce qui permet à Hibernate d'envoyer les `INSERT` en lots JDBC.
 - **Mise à jour sans tout recréer.** Les attributs sont rapprochés par nom : un attribut conservé garde son identifiant, au lieu d'être supprimé puis réinséré (contournement qui imposait un `flush` intermédiaire, Hibernate exécutant les insertions avant les suppressions).
@@ -157,7 +157,7 @@ Ce qui a changé :
 - **Entités correctes.** Verrou optimiste (`@Version`, conflit renvoyé en 409), `equals`/`hashCode` sur l'identifiant sans casser les collections avant persistance, plus de `@Builder` Lombok qui contournait la synchronisation des relations, `open-in-view` désactivé.
 - **Code mort retiré** : distributions, sources de données et logique de génération restées dans les entités alors que la génération est faite par `generator_service`.
 
-Les tests (`mvn test`) tournent sur un PostgreSQL lancé par Testcontainers : il faut Docker.
+Les tests (`mvn test`) tournent sur H2 en mémoire, sans Docker. Console H2 : http://localhost:8081/api/h2-console (URL JDBC `jdbc:h2:file:./data/dataset-manager`, utilisateur `sa`). Une ancienne base `data/devDb`, créée par `ddl-auto=update`, n'est plus utilisée : Flyway refuse de migrer un schéma qu'il n'a pas créé.
 
 ### 5. `generator_service`
 
@@ -165,10 +165,27 @@ Le nouveau service "ouvrier". **Stateless** (pas de base de données, pas d'éta
 
 | Méthode | Endpoint | Description |
 |---|---|---|
-| GET | `/api/generator/{projectId}/preview` | Aperçu JSON des données générées |
-| GET | `/api/generator/{projectId}/export?format=json\|xml\|csv\|sql` | Export du fichier complet |
+| GET | `/api/generator/{projectId}/preview` | Aperçu JSON : 100 lignes par table au plus (`app.preview.rows-per-table`) |
+| GET | `/api/generator/{projectId}/export?format=json\|xml\|csv\|sql` | Export complet, envoyé en streaming |
 
 Pour générer les données, ce service ne connaît rien du modèle : il va chercher la définition du projet (entités, attributs, types, contraintes) auprès de `dataset-manager` via Feign, puis génère les valeurs avec Datafaker. Le générateur détecte automatiquement le domaine d'un attribut à partir de son nom (`email`, `firstName`, `city`, `price`...) et, à défaut, se base sur son type (`IntegerType`, `DateType`, `EnumType`...).
+
+#### Données relationnelles
+
+Chaque table reçoit une clé `id` (1 à n). Une sous-entité reçoit une colonne `<parent>_id` qui contient l'`id` d'une ligne existante de sa table parente : les tables générées sont reliées comme dans une vraie base. Les parents sont générés avant leurs sous-entités, et les exports les écrivent dans cet ordre.
+
+L'export SQL commence chaque table par un `CREATE TABLE` avec sa clé primaire et sa clé étrangère, puis insère les lignes : le script se charge tel quel dans PostgreSQL, contraintes actives. Le type de chaque colonne est déduit des valeurs réellement générées, pas du type déclaré, car le générateur par nom peut renvoyer du texte pour un attribut déclaré entier (`phone`, par exemple). `SqlExportLoadsIntoPostgresTest` charge un export client → commande → ligne de commande (200, 1 000 et 3 000 lignes, dont une table nommée `order`, mot réservé) dans un PostgreSQL réel et vérifie les jointures.
+
+#### Export en streaming
+
+L'export écrit chaque ligne dans la réponse HTTP dès qu'elle est générée (`StreamingResponseBody`), sans fichier temporaire ni jeu de données en mémoire : seuls le nombre de lignes de chaque table parente et un échantillon de 1 000 lignes servant à fixer les types des colonnes sont gardés. Avant, tout le jeu de données était construit en mémoire puis écrit dans un dossier temporaire jamais supprimé.
+
+| 1 000 000 de lignes exportées en SQL, JVM limitée à 64 Mo de heap | Résultat |
+|---|---|
+| Génération en mémoire puis export (fonctionnement précédent) | `OutOfMemoryError` |
+| Export en streaming | terminé |
+
+Mesuré par `StreamingMemoryTest`, qui lance chaque cas dans une JVM séparée avec `-Xmx64m`. Le nombre de lignes par table est plafonné à 1 000 000 côté `dataset-manager` : le plafond borne la durée et la taille d'un export, plus la mémoire du serveur.
 
 ## Communication entre services — OpenFeign
 
@@ -207,9 +224,15 @@ resilience4j.timelimiter.instances.datasetManagerClient.cancelRunningFuture=true
 En clair :
 - au bout de 5 appels minimum, si plus de 50% ont échoué sur les 10 derniers, le circuit s'ouvre ;
 - pendant 5 secondes, on ne tente même plus d'appeler `dataset-manager` (échec immédiat → fallback) ;
-- si un appel met plus de 10 secondes, il est annulé et traité comme un échec.
+- si un appel met plus de 10 secondes, il est annulé et traité comme un échec ;
+- un 404 (projet inexistant) n'est pas une panne : il ne compte pas dans le taux d'échec (`ClientErrorPredicate`).
 
-Le **fallback** (`DatasetManagerClientFallback`) renvoie `null` pour `getProject` et une liste vide pour `getProjectEntities`. Côté `DataGenerationServiceImpl`, si `dataset-manager` ne répond pas, l'endpoint `/preview` renvoie quand même un **200 OK** avec un corps du type :
+**Nom du circuit breaker.** Par défaut, Spring Cloud OpenFeign crée un circuit breaker par méthode, nommé d'après elle (`DatasetManagerClientgetProjectEntitiesLong`). La configuration ci-dessus, qui vise `datasetManagerClient`, ne s'appliquait donc à rien : les valeurs par défaut tournaient, dont un TimeLimiter de **1 seconde**. Un premier appel lent mais sain partait ainsi dans le fallback, et l'export renvoyait un fichier vide. `FeignResilienceConfig` nomme désormais le circuit breaker d'après l'interface du client, et `DatasetManagerOutageTest` vérifie qu'un seul circuit breaker existe, avec ces réglages.
+
+Le **fallback** (`DatasetManagerClientFallback`, une `FallbackFactory`) reçoit la cause de l'échec. Il ne renvoie jamais de données vides : un 404 de `dataset-manager` devient un 404 pour le client, une panne devient une `DatasetManagerUnavailableException`. Ensuite :
+
+- l'**export** répond **503** avec `{"status": "PARTIAL", "message": "...", "data": []}`, pour qu'un script qui télécharge un export ne prenne pas une panne pour un jeu de données vide ;
+- l'**aperçu** répond **200 OK** avec un corps du type :
 
 ```json
 {
@@ -221,7 +244,9 @@ Le **fallback** (`DatasetManagerClientFallback`) renvoie `null` pour `getProject
 }
 ```
 
-→ Pas de stacktrace renvoyée au client, conformément à la consigne.
+→ Pas de stacktrace renvoyée au client, conformément à la consigne. Un format d'export inconnu répond 400 au lieu de 500 (`GeneratorExceptionHandler`).
+
+`DatasetManagerOutageTest` rejoue le scénario de validation contre un faux `dataset-manager` (serveur HTTP du JDK), avec le vrai fichier `config-repo/generator.properties` : export sain, manager lent (2 s) mais en bonne santé, projet inexistant (404, circuit toujours fermé), panne (503 et fallback `PARTIAL`), ouverture du circuit après 5 échecs, format inconnu (400).
 
 ## Scénario de test
 
@@ -314,7 +339,7 @@ docker-compose logs -f dataset-manager      # un service
 
 # Arrêt
 docker-compose down                         # arrêter
-docker-compose down -v                      # arrêter + supprimer la base PostgreSQL
+docker-compose down -v                      # arrêter + supprimer la base H2
 docker-compose down -v --rmi all            # tout supprimer
 
 # Rebuild d'un seul service
@@ -326,7 +351,7 @@ docker exec -it dataset-manager sh
 
 ### Persistance des données
 
-La base PostgreSQL (service `dataset-db`) est stockée dans le volume Docker `dataset-db-data`. Elle survit aux redémarrages (`docker-compose down`) mais est effacée avec `docker-compose down -v`. Le schéma est créé par Flyway au premier démarrage de `dataset-manager`.
+La base H2 est stockée dans le volume Docker `dataset-manager-data`, géré automatiquement. Elle survit aux redémarrages (`docker-compose down`) mais est effacée avec `docker-compose down -v`. Le schéma est créé par Flyway au premier démarrage de `dataset-manager`.
 
 ### Dépannage
 
@@ -344,9 +369,9 @@ docker-compose up --build
 
 ## Limites connues / à finaliser
 
-- La règle de réécriture de la gateway pour `/DATASET-MANAGER/api/projects/**` est à revérifier vis-à-vis du `context-path=/api` de `dataset-manager` (les routes auto-découverte `/dataset-manager/**` et `/generator/**` fonctionnent en attendant).
-- Le champ `generator` (FakerGenerator/SequentialGenerator, locale, valeur de départ...) défini sur un attribut n'est pas encore propagé jusqu'au `generator-service` : la génération se base uniquement sur le nom et le type de l'attribut pour l'instant.
-- Les distributions statistiques (`distribution/` côté `dataset-manager`) ne sont pas encore exploitées par le `generator-service`.
+- La réécriture des routes manuelles de la gateway (`/DATASET-MANAGER/...`, `/GENERATOR-SERVICE/...`) a été corrigée : elle retire seulement le préfixe. L'ancienne règle perdait le segment `projects`. Elle reste à valider en lançant la gateway.
+- Le champ `generator` (FakerGenerator/SequentialGenerator, locale, valeur de départ...) est accepté par l'API mais n'est ni enregistré ni utilisé : la génération se base sur le nom et le type de l'attribut.
+- Les distributions statistiques (loi normale, probabilités par valeur d'une énumération) ne sont pas gérées.
 
 ## Auteurs
 

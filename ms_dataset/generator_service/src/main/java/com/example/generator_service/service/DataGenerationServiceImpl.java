@@ -2,63 +2,68 @@ package com.example.generator_service.service;
 
 import com.example.generator_service.dataset.Dataset;
 import com.example.generator_service.dataset.Record;
+import com.example.generator_service.dataset.RowSink;
 import com.example.generator_service.dto.entity.DataEntityResponseDTO;
 import com.example.generator_service.dto.generation.EntityDataDTO;
 import com.example.generator_service.dto.generation.PreviewResponseDTO;
 import com.example.generator_service.dto.generation.RecordDTO;
 import com.example.generator_service.dto.project.ProjectResponseDTO;
 import com.example.generator_service.feign.DatasetManagerClient;
+import com.example.generator_service.feign.DatasetManagerUnavailableException;
 import com.example.generator_service.generation.FakerDataGenerator;
-import com.example.generator_service.generation.interfaces.IDataGenerator;
-import com.example.generator_service.util.RecordGenerator;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
+import com.example.generator_service.generation.RelationalDatasetBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.random.RandomGenerator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class DataGenerationServiceImpl implements DataGenerationService {
 
     private final DatasetManagerClient datasetManagerClient;
+    private final int previewRows;
+
+    public DataGenerationServiceImpl(DatasetManagerClient datasetManagerClient,
+                                     @Value("${app.preview.rows-per-table:100}") int previewRows) {
+        this.datasetManagerClient = datasetManagerClient;
+        this.previewRows = previewRows;
+    }
 
     @Override
     public PreviewResponseDTO generatePreview(Long projectId) {
         log.info("Generating preview for project ID: {}", projectId);
 
-        ProjectResponseDTO project = datasetManagerClient.getProject(projectId);
-        List<DataEntityResponseDTO> entities = datasetManagerClient.getProjectEntities(projectId);
-
-        // Si fallback déclenché (project null), retourner réponse partielle
-        if (project == null) {
-            log.warn("Circuit breaker triggered: dataset-manager is unavailable");
+        ProjectResponseDTO project;
+        List<DataEntityResponseDTO> entities;
+        try {
+            project = datasetManagerClient.getProject(projectId);
+            entities = datasetManagerClient.getProjectEntities(projectId);
+        } catch (DatasetManagerUnavailableException e) {
+            // Fallback (circuit breaker): a partial answer instead of an error. An unknown project still gives 404.
             return PreviewResponseDTO.builder()
                     .projectId(projectId)
                     .projectName("Not available")
                     .status("PARTIAL")
-                    .message("Le service dataset-manager est indisponible. Veuillez réessayer plus tard.")
+                    .message(e.getMessage())
                     .data(List.of())
                     .build();
         }
 
-        Dataset dataset = generateDatasetFromEntities(entities, new FakerDataGenerator());
+        // Capped: a table of a million rows previews in the same time as one of ten.
+        Dataset dataset = builder().preview(entities, previewRows);
 
         List<EntityDataDTO> entityDataList = new ArrayList<>();
         for (Map.Entry<String, List<Record>> entry : dataset.getAllRecords().entrySet()) {
-            String entityName = entry.getKey();
-            List<Record> records = entry.getValue();
-
             List<RecordDTO> recordDTOs = new ArrayList<>();
-            for (Record record : records) {
+            for (Record record : entry.getValue()) {
                 recordDTOs.add(RecordDTO.builder().fields(record.getValues()).build());
             }
-
             entityDataList.add(EntityDataDTO.builder()
-                    .entityName(entityName)
+                    .entityName(entry.getKey())
                     .records(recordDTOs)
                     .build());
         }
@@ -71,57 +76,23 @@ public class DataGenerationServiceImpl implements DataGenerationService {
                 .build();
     }
 
+    /**
+     * Throws {@link DatasetManagerUnavailableException} on an outage (503) and {@code ProjectNotFoundException} for
+     * an unknown project (404): an export never sends an empty file in place of an error.
+     */
     @Override
-    public Dataset generateDataset(Long projectId) {
-        log.info("Generating dataset for project ID: {}", projectId);
-
-        List<DataEntityResponseDTO> entities = datasetManagerClient.getProjectEntities(projectId);
-        return generateDatasetFromEntities(entities, new FakerDataGenerator());
+    public List<DataEntityResponseDTO> loadEntities(Long projectId) {
+        log.info("Loading entities of project ID: {}", projectId);
+        return datasetManagerClient.getProjectEntities(projectId);
     }
 
-    private Dataset generateDatasetFromEntities(List<DataEntityResponseDTO> entities, IDataGenerator generator) {
-        Dataset dataset = new Dataset();
-        RecordGenerator recordGenerator = new RecordGenerator(generator);
-
-        for (DataEntityResponseDTO entity : entities) {
-            if (entity == null) continue;
-            int count = Math.max(0, entity.getQuantity());
-            if (count <= 0) continue;
-
-            List<Map<String, Object>> rows = recordGenerator.generateFromDTO(entity, count);
-            List<Record> records = new ArrayList<>(rows.size());
-            for (Map<String, Object> row : rows) {
-                Record r = new Record();
-                for (Map.Entry<String, Object> col : row.entrySet()) {
-                    r.setValue(col.getKey(), col.getValue());
-                }
-                records.add(r);
-            }
-            dataset.addRecords(entity.getName(), records);
-            generateSubEntitiesForDataset(entity, dataset, recordGenerator);
-        }
-
-        return dataset;
+    @Override
+    public void generate(List<DataEntityResponseDTO> entities, RowSink sink) {
+        builder().generate(entities, Integer.MAX_VALUE, sink);
     }
 
-    private void generateSubEntitiesForDataset(DataEntityResponseDTO parentEntity, Dataset dataset, RecordGenerator recordGenerator) {
-        if (parentEntity.getSubEntities() == null) return;
-
-        for (DataEntityResponseDTO subEntity : parentEntity.getSubEntities()) {
-            int count = Math.max(0, subEntity.getQuantity());
-            if (count <= 0) continue;
-
-            List<Map<String, Object>> rows = recordGenerator.generateFromDTO(subEntity, count);
-            List<Record> records = new ArrayList<>(rows.size());
-            for (Map<String, Object> row : rows) {
-                Record r = new Record();
-                for (Map.Entry<String, Object> col : row.entrySet()) {
-                    r.setValue(col.getKey(), col.getValue());
-                }
-                records.add(r);
-            }
-            dataset.addRecords(subEntity.getName(), records);
-            generateSubEntitiesForDataset(subEntity, dataset, recordGenerator);
-        }
+    /** Parents first, each sub-entity row referencing an existing parent row (see {@link RelationalDatasetBuilder}). */
+    private static RelationalDatasetBuilder builder() {
+        return new RelationalDatasetBuilder(new FakerDataGenerator(), RandomGenerator.getDefault());
     }
 }

@@ -1,47 +1,71 @@
 package com.example.generator_service.export;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.example.generator_service.dataset.Record;
+import com.example.generator_service.dataset.TableSchema;
+import com.example.generator_service.dataset.TableSchema.Column;
+import com.example.generator_service.export.interfaces.IDataExporter;
+import java.io.Writer;
+import java.util.Date;
 import java.util.StringJoiner;
 
-import com.example.generator_service.dataset.Dataset;
-import com.example.generator_service.dataset.Record;
-
 /**
- * Export SQL simple : génère des INSERT INTO pour chaque enregistrement.
+ * SQL script that loads as is into PostgreSQL: a {@code CREATE TABLE} per entity with its primary key and, for a
+ * sub-entity, its foreign key to the parent table, then the rows. Tables come parents first, so every foreign key
+ * already has its target when a row is inserted.
  */
-public class SQLExporter implements com.example.generator_service.export.interfaces.IDataExporter {
+public class SQLExporter implements IDataExporter {
 
     @Override
-    public void export(Dataset dataset, String outputPath) throws IOException {
-        if (dataset == null) throw new IllegalArgumentException("Dataset ne peut pas être null");
-
-        try (FileWriter fw = new FileWriter(outputPath)) {
-            for (Map.Entry<String, List<Record>> entry : dataset.getAllRecords().entrySet()) {
-                String table = entry.getKey();
-                List<Record> records = entry.getValue();
-                for (Record r : records) {
-                    StringJoiner cols = new StringJoiner(", ");
-                    StringJoiner vals = new StringJoiner(", ");
-                    for (Map.Entry<String, Object> c : r.getValues().entrySet()) {
-                        cols.add(escapeIdentifier(c.getKey()));
-                        vals.add(formatValue(c.getValue()));
-                    }
-                    fw.write(String.format("INSERT INTO %s (%s) VALUES (%s);\n", escapeIdentifier(table), cols.toString(), vals.toString()));
-                }
+    public TableWriter open(Writer out) {
+        return new StreamingWriter(out) {
+            @Override
+            protected void startTable(TableSchema schema, TableSchema previous) {
+                write((previous == null ? "" : "\n") + createTable(schema));
             }
+
+            @Override
+            public void row(Record record) {
+                write(insert(current, record));
+            }
+        };
+    }
+
+    static String createTable(TableSchema table) {
+        StringJoiner definitions = new StringJoiner(",\n    ", "(\n    ", "\n);\n");
+        for (Column column : table.columns()) {
+            String definition = identifier(column.name()) + " " + column.type().sql();
+            if (column.name().equals(TableSchema.PRIMARY_KEY)) {
+                definition += " primary key";
+            }
+            definitions.add(definition);
         }
+        if (table.foreignKey() != null) {
+            definitions.add("foreign key (" + identifier(table.foreignKey().column()) + ") references "
+                    + identifier(table.foreignKey().referencedTable()) + " (" + identifier(TableSchema.PRIMARY_KEY) + ")");
+        }
+        return "CREATE TABLE " + identifier(table.name()) + " " + definitions;
     }
 
-    private String escapeIdentifier(String s) {
-        return "\"" + s.replace("\"", "\"\"") + "\"";
+    private static String insert(TableSchema table, Record row) {
+        StringJoiner columns = new StringJoiner(", ");
+        StringJoiner values = new StringJoiner(", ");
+        for (Column column : table.columns()) {
+            columns.add(identifier(column.name()));
+            values.add(literal(row.getValue(column.name())));
+        }
+        return "INSERT INTO " + identifier(table.name()) + " (" + columns + ") VALUES (" + values + ");\n";
     }
 
-    private String formatValue(Object v) {
-        if (v == null) return "NULL";
-        if (v instanceof Number || v instanceof Boolean) return v.toString();
-        return "'" + v.toString().replace("'", "''") + "'";
+    /** Quoted, so names such as {@code order} or {@code user} are valid table names. */
+    private static String identifier(String name) {
+        return "\"" + name.replace("\"", "\"\"") + "\"";
+    }
+
+    private static String literal(Object value) {
+        if (value == null) return "NULL";
+        if (value instanceof Number || value instanceof Boolean) return value.toString();
+        // ISO-8601, which PostgreSQL parses whatever the server's date style.
+        if (value instanceof Date date) return "'" + date.toInstant() + "'";
+        return "'" + value.toString().replace("'", "''") + "'";
     }
 }

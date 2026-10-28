@@ -6,10 +6,10 @@ create sequence attribute_seq start with 1 increment by 50;
 
 create table project (
     id         bigint primary key,
-    name       varchar(255) not null unique,
-    version    bigint       not null,
-    created_at timestamptz  not null,
-    updated_at timestamptz  not null
+    name       varchar(255)             not null unique,
+    version    bigint                   not null,
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
 );
 
 -- Sub-entities carry their project too: a whole project loads with one query, and names are unique per project
@@ -26,12 +26,12 @@ create table data_entity (
 
 create index idx_data_entity_parent on data_entity (parent_id);
 
--- Type and constraints are a value owned by the attribute: one jsonb column instead of three tables and joins.
+-- Type and constraints are a value owned by the attribute: one JSON column instead of three tables and joins.
 create table attribute (
     id             bigint primary key,
     data_entity_id bigint       not null references data_entity (id) on delete cascade,
     name           varchar(255) not null,
     quantity       integer      not null,
-    definition     jsonb        not null,
+    definition     json         not null,
     constraint uk_attribute_entity_name unique (data_entity_id, name)
 );

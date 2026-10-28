@@ -2,71 +2,57 @@ package com.example.generator_service.dataset;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Représente un ensemble de données générées pour un projet.
- * Les enregistrements sont regroupés par nom d'entité.
+ * Generated tables held in memory, with their schema: used for the preview, which is capped to a few rows per
+ * table. Exports do not build one; they stream rows to a writer. Tables are kept in the order they were added,
+ * parents before their sub-entities. Built by one request on one thread: no synchronisation needed.
  */
-public class Dataset {
+public class Dataset implements RowSink {
 
-    private final Map<String, List<Record>> records = new ConcurrentHashMap<>();
+    private final Map<String, List<Record>> records = new LinkedHashMap<>();
+    private final Map<String, TableSchema> schemas = new LinkedHashMap<>();
+    private List<Record> current;
 
-    /**
-     * Ajoute plusieurs enregistrements pour une entité donnée.
-     * Si l'entité n'existe pas encore, elle est créée.
-     *
-     * @param entityName nom de l'entité
-     * @param newRecords liste d'enregistrements à ajouter
-     */
-    public void addRecords(String entityName, List<Record> newRecords) {
-        if (entityName == null || newRecords == null) return;
-        records.compute(entityName, (k, v) -> {
-            if (v == null) v = Collections.synchronizedList(new ArrayList<>());
-            v.addAll(newRecords);
-            return v;
-        });
+    @Override
+    public void table(TableSchema schema) {
+        if (schemas.putIfAbsent(schema.name(), schema) != null) {
+            throw new IllegalArgumentException("Duplicate table name: " + schema.name());
+        }
+        current = new ArrayList<>();
+        records.put(schema.name(), current);
     }
 
-    /**
-     * Ajoute un seul enregistrement pour une entité.
-     *
-     * @param entityName nom de l'entité
-     * @param record enregistrement
-     */
-    public void addRecord(String entityName, Record record) {
-        if (entityName == null || record == null) return;
-        records.compute(entityName, (k, v) -> {
-            if (v == null) v = Collections.synchronizedList(new ArrayList<>());
-            v.add(record);
-            return v;
-        });
+    @Override
+    public void row(Record record) {
+        if (current == null) {
+            throw new IllegalStateException("row() before table()");
+        }
+        current.add(record);
     }
 
-    /**
-     * Récupère la liste d'enregistrements pour une entité.
-     * Retourne une liste immuable (copie) pour éviter les modifications externes.
-     *
-     * @param entityName nom de l'entité
-     * @return liste d'enregistrements (vide si aucun)
-     */
-    public List<Record> getRecords(String entityName) {
-        List<Record> list = records.get(entityName);
-        if (list == null) return Collections.emptyList();
-        synchronized (list) {
-            return new ArrayList<>(list);
+    /** Replays the tables, in order, into another sink. */
+    public void replay(RowSink sink) {
+        for (TableSchema schema : schemas.values()) {
+            sink.table(schema);
+            records.get(schema.name()).forEach(sink::row);
         }
     }
 
-    /**
-     * Récupère toutes les entrées (copie superficielle).
-     *
-     * @return map nomEntité -> liste d'enregistrements
-     */
+    public List<Record> getRecords(String entityName) {
+        return Collections.unmodifiableList(records.getOrDefault(entityName, List.of()));
+    }
+
+    /** Table name to rows, parents first. */
     public Map<String, List<Record>> getAllRecords() {
-        return new ConcurrentHashMap<>(records);
+        return Collections.unmodifiableMap(records);
+    }
+
+    /** Table schemas, parents first. */
+    public List<TableSchema> getSchemas() {
+        return List.copyOf(schemas.values());
     }
 }
-

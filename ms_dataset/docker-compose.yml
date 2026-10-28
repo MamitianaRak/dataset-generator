@@ -44,25 +44,7 @@ services:
       retries: 5
       start_period: 60s
 
-  # 3a. Base PostgreSQL du Dataset Manager (schéma créé par Flyway au démarrage du service)
-  dataset-db:
-    image: postgres:17-alpine
-    container_name: dataset-db
-    environment:
-      - POSTGRES_DB=dataset_manager
-      - POSTGRES_USER=dataset
-      - POSTGRES_PASSWORD=dataset
-    volumes:
-      - dataset-db-data:/var/lib/postgresql/data
-    networks:
-      - microservices-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dataset -d dataset_manager"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  # 3b. Dataset Manager Service - pas d'Actuator, on vérifie l'endpoint /api/projects
+  # 3. Dataset Manager Service - pas d'Actuator, on vérifie l'endpoint /api/projects
   dataset-manager:
     build:
       context: ./dataset_manager_service
@@ -73,14 +55,11 @@ services:
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - DATABASE_URL=jdbc:postgresql://dataset-db:5432/dataset_manager
-      - DATABASE_USER=dataset
-      - DATABASE_PASSWORD=dataset
+    volumes:
+      - dataset-manager-data:/app/data
     networks:
       - microservices-network
     depends_on:
-      dataset-db:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
     healthcheck:
@@ -142,6 +121,6 @@ networks:
   microservices-network:
     driver: bridge
 
-# Volume pour persister la base PostgreSQL
+# Volume pour persister la base H2
 volumes:
-  dataset-db-data:
+  dataset-manager-data:

@@ -24,8 +24,14 @@ WORKDIR /app
 # Copier le jar depuis le stage de build
 COPY --from=build /app/target/*.jar app.jar
 
-# Les données sont dans PostgreSQL (service dataset-db) : plus de fichier H2 dans le conteneur
+# Créer le répertoire pour la base H2
+RUN mkdir -p /app/data
+
+# Exposer le port
 EXPOSE 8081
+
+# Volume pour persister la base H2
+VOLUME /app/data
 
 # Démarrer l'application
 ENTRYPOINT ["java", "-jar", "app.jar"]
