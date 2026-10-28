@@ -48,35 +48,39 @@ CREATE TABLE "order" (
 
 ```mermaid
 flowchart LR
-    subgraph Clients
-        UI["Front React + TS<br/>:5173"]
-        API["Bruno / curl"]
+    subgraph clients [Clients]
+        ui[Front React TypeScript - 5173]
+        bruno[Bruno ou curl]
     end
 
-    subgraph Infrastructure
-        CFG["Config Server<br/>:8888"]
-        EUR["Eureka<br/>:8761"]
-        GW["Gateway<br/>:8083"]
+    subgraph infra [Infrastructure]
+        config[Config Server - 8888]
+        eureka[Eureka - 8761]
+        gateway[Gateway - 8083]
     end
 
-    subgraph Services
-        MGR["dataset-manager<br/>:8081<br/>modélisation, CRUD"]
-        GEN["generator<br/>:8082<br/>génération, export<br/>sans état"]
+    subgraph services [Microservices]
+        manager[dataset-manager - 8081]
+        generator[generator - 8082]
     end
 
-    DB[("H2<br/>schéma Flyway")]
-    REPO[["config-repo/<br/>*.properties"]]
+    db[(H2 + Flyway)]
+    repo[config-repo]
 
-    UI --> MGR
-    UI --> GEN
-    API --> GW
-    GW --> MGR
-    GW --> GEN
-    GEN -- "OpenFeign<br/>circuit breaker + TimeLimiter" --> MGR
-    MGR --> DB
-    CFG --- REPO
-    CFG -. configuration .-> MGR & GEN & GW & EUR
-    MGR & GEN & GW -. enregistrement .-> EUR
+    ui --> manager
+    ui --> generator
+    bruno --> gateway
+    gateway --> manager
+    gateway --> generator
+    generator -->|OpenFeign + circuit breaker| manager
+    manager --> db
+    repo --> config
+    config -.->|configuration| manager
+    config -.->|configuration| generator
+    config -.->|configuration| gateway
+    manager -.->|inscription| eureka
+    generator -.->|inscription| eureka
+    gateway -.->|inscription| eureka
 ```
 
 | Composant | Port | Rôle |
